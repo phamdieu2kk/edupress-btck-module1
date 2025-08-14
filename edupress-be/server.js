@@ -5,13 +5,13 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 
-// Import routes
+const app = express();
+
+// ===== Import routes =====
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/users.routes');
-const courseRoutes = require('./routes/courses.routes');
-// const adminRoutes = require('./routes/admin.routes'); // nếu cần
-
-const app = express();
+const courseRoutes = require('./routes/courses.routes'); // courses từ backend cũ
+const blogRoutes = require('./routes/blog.routes'); // blogs mới
 
 // ===== Middlewares =====
 app.use(express.json());
@@ -31,8 +31,8 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 // ===== Routes =====
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/courses', courseRoutes);
-// app.use('/api/admin', adminRoutes); // nếu cần
+app.use('/api/courses', courseRoutes); // courses API
+app.use('/api/blogs', blogRoutes); // blogs API
 
 // ===== Start Server =====
 const PORT = process.env.PORT || 5000;
