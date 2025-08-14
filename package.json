@@ -17,12 +17,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-<<<<<<< HEAD
   "description": "",
   "devDependencies": {
     "nodemon": "^3.1.10"
   }
-=======
-  "description": ""
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
 }

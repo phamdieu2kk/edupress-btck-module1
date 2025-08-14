@@ -1,11 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-<<<<<<< HEAD
 import Auth from "./auth/Auth";
-=======
-import Login from "./auth/Login";
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
 import Register from "./auth/Register";
 import CoursesPage from "./pages/Courses";
 import Blog from "./pages/Blog";
@@ -20,11 +16,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-<<<<<<< HEAD
         <Route path="/auth" element={<Auth />} />
-=======
-        <Route path="/login" element={<Login />} />
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
         <Route path="/register" element={<Register />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/courses/:id" element={<CourseDetail />} /> {/* ✅ Route chi tiết */}

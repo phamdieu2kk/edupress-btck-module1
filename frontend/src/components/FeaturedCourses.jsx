@@ -9,11 +9,7 @@ import {
   Chip,
   Stack,
   Container,
-<<<<<<< HEAD
   Divider,
-=======
-  Divider, // Import Divider component from Material-UI
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
 } from "@mui/material";
 
 import course01 from "../assets/course01.jpg";
@@ -94,11 +90,7 @@ const courses = [
 
 const FeaturedCourses = () => {
   return (
-<<<<<<< HEAD
     <Box sx={{ py: { xs: 4, md: 6 }, backgroundColor: "#f9f9f9" }}>
-=======
-    <Box sx={{  py: { xs: 4, md: 6 }, backgroundColor: "#f9f9f9" }}>
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
       <Container maxWidth="lg">
         {/* Header */}
         <Box
@@ -119,7 +111,6 @@ const FeaturedCourses = () => {
               Explore our popular courses curated just for you.
             </Typography>
           </Box>
-<<<<<<< HEAD
           <Button
             variant="outlined"
             size="large"
@@ -128,16 +119,6 @@ const FeaturedCourses = () => {
               fontWeight: 500,
               border: "1px solid",
               borderColor: "primary.main",
-=======
-           <Button 
-           
-                          variant="outlined" size="large"
-                          sx={{
-              textTransform: "none",
-              fontWeight: 500,
-              border: "1px solid",
-              borderColor: "primary.main", // màu viền theo theme
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
               borderRadius: 2,
               px: 2,
               py: 0.5,
@@ -147,31 +128,18 @@ const FeaturedCourses = () => {
                 color: "#fff",
               },
             }}
-<<<<<<< HEAD
           >
-=======
-                          >
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
             All Courses
           </Button>
         </Box>
 
-<<<<<<< HEAD
         {/* Course Cards */}
-=======
-        {/* 3 columns x 2 rows layout */}
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
         <Box
           sx={{
             display: "flex",
             flexWrap: "wrap",
-<<<<<<< HEAD
             justifyContent: { xs: "center", sm: "space-around", md: "space-between" },
             gap: { xs: 2, sm: 2.5, md: 3 },
-=======
-            justifyContent: "space-between",
-            rowGap: 4,
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
           }}
         >
           {courses.map((course) => (
@@ -179,15 +147,9 @@ const FeaturedCourses = () => {
               key={course.id}
               sx={{
                 width: {
-<<<<<<< HEAD
-                  xs: "100%",           // Mobile: 1 card per row
-                  sm: "calc(50% - 12px)", // Tablet: 2 cards per row
-                  md: "calc(33.333% - 20px)", // Laptop: 3 cards per row
-=======
                   xs: "100%",
                   sm: "calc(50% - 12px)",
                   md: "calc(33.333% - 20px)",
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
                 },
               }}
             >
@@ -198,11 +160,8 @@ const FeaturedCourses = () => {
                   flexDirection: "column",
                   height: "100%",
                   boxShadow: 2,
-<<<<<<< HEAD
                   transition: "0.25s ease",
                   "&:hover": { transform: "translateY(-4px)", boxShadow: 3 },
-=======
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
                 }}
               >
                 <Box sx={{ position: "relative" }}>
@@ -233,11 +192,7 @@ const FeaturedCourses = () => {
                   <Typography variant="subtitle1" fontWeight={600} gutterBottom>
                     {course.title}
                   </Typography>
-<<<<<<< HEAD
                   <Stack direction="row" spacing={2} my={1} flexWrap="wrap">
-=======
-                  <Stack direction="row" spacing={2} my={1}>
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
                     <Typography variant="caption" color="text.secondary">
                       ⏱ {course.duration}
                     </Typography>
@@ -246,42 +201,27 @@ const FeaturedCourses = () => {
                     </Typography>
                   </Stack>
 
-<<<<<<< HEAD
                   <Divider sx={{ my: 1.5, borderColor: "#eee" }} />
 
-=======
-                  {/* Thanh ngang */}
-                  <Divider sx={{ my: 1.5, borderColor: '#eee' }} /> {/* Added Divider here */}
-
-                  {/* Giá + Nút View More cùng hàng */}
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
                   <Box
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-<<<<<<< HEAD
-=======
-                      // mt: 2, // Removed mt as Divider provides spacing
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
                     }}
                   >
                     <Typography variant="body2" fontWeight={500}>
                       <s style={{ color: "#aaa", marginRight: 8 }}>
                         {course.priceOld}
                       </s>
-                      {course.priceNew.includes("Free") ? (
+                      {course.priceNew === "Free" ? (
                         <span style={{ color: "#2ecc71" }}>{course.priceNew}</span>
                       ) : (
                         <span style={{ color: "#e74c3c" }}>{course.priceNew}</span>
                       )}
                     </Typography>
 
-<<<<<<< HEAD
                     <Button size="small" sx={{ textTransform: "none" }}>
-=======
-                    <Button size="small" sx={{ textTransform: 'none' }}>
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
                       View More
                     </Button>
                   </Box>
@@ -295,8 +235,4 @@ const FeaturedCourses = () => {
   );
 };
 
-<<<<<<< HEAD
 export default FeaturedCourses;
-=======
-export default FeaturedCourses;
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b

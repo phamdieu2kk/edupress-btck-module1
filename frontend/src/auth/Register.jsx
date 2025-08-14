@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-<<<<<<< HEAD
   Paper,
   TextField,
   Button,
@@ -13,6 +12,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const inputSx = {
   "& .MuiOutlinedInput-root": {
     borderRadius: 10,
@@ -24,23 +25,6 @@ const inputSx = {
 };
 
 const Register = () => {
-=======
-  Box,
-  TextField,
-  Typography,
-  Button,
-  IconButton,
-  InputAdornment,
-  CircularProgress,
-  Container,
-  Paper,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-
-const Register = () => {
-  const navigate = useNavigate();
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -51,63 +35,35 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
-<<<<<<< HEAD
   const navigate = useNavigate();
 
   const validateRegister = () => {
     const newErrors = {};
     if (!formData.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Invalid email format";
     if (!formData.username) newErrors.username = "Username is required";
     if (!formData.password) newErrors.password = "Password is required";
     else if (formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
     if (formData.confirmPassword !== formData.password)
       newErrors.confirmPassword = "Passwords do not match";
-=======
-
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
-
-    if (!formData.username) {
-      newErrors.username = "Username is required";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Confirm password is required";
-    } else if (formData.confirmPassword !== formData.password) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-<<<<<<< HEAD
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!validateRegister()) return;
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
+      const res = await axios.post(`${API_URL}/api/auth/register`, {
         name: formData.username,
         email: formData.email,
         password: formData.password,
       });
       alert(res.data.message || "Registration successful!");
-      navigate("/auth");
+      navigate("/auth/login");
     } catch (error) {
       alert(error.response?.data?.message || "Registration failed.");
     } finally {
@@ -132,7 +88,7 @@ const Register = () => {
       </Typography>
       <form
         onSubmit={handleRegister}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
+        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
       >
         <TextField
           fullWidth
@@ -220,137 +176,6 @@ const Register = () => {
         </Button>
       </form>
     </Paper>
-=======
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert("Registration successful!");
-      navigate("/login");
-    }, 2000);
-  };
-
-  return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ p: 4, mt: 5, borderRadius: 4 }}>
-        <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
-          Register
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Email"
-            margin="normal"
-            variant="outlined"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            error={!!errors.email}
-            helperText={errors.email}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 8,
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="Username"
-            margin="normal"
-            variant="outlined"
-            value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            error={!!errors.username}
-            helperText={errors.username}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 8,
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            margin="normal"
-            variant="outlined"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            error={!!errors.password}
-            helperText={errors.password}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 8,
-              },
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword((show) => !show)}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="Confirm Password"
-            type={showConfirm ? "text" : "password"}
-            margin="normal"
-            variant="outlined"
-            value={formData.confirmPassword}
-            onChange={(e) =>
-              setFormData({ ...formData, confirmPassword: e.target.value })
-            }
-            error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 8,
-              },
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowConfirm((show) => !show)}>
-                    {showConfirm ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <Button
-            fullWidth
-            type="submit"
-            variant="contained"
-            sx={{
-              mt: 2,
-              py: 1.5,
-              fontWeight: "bold",
-              borderRadius: 6,
-              backgroundColor: "#ef9133ff",
-              color: "#fff",
-              textTransform: "uppercase",
-              fontSize: "16px",
-              "&:hover": {
-                backgroundColor: "#ea7a2bff",
-              },
-            }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Register"}
-          </Button>
-        </form>
-      </Paper>
-    </Container>
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
   );
 };
 

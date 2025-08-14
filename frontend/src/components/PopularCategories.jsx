@@ -31,23 +31,14 @@ const categories = [
 
 export default function PopularCategories() {
   const theme = useTheme();
-<<<<<<< HEAD
   const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // <600px
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); // 600-900px
   const isLaptop = useMediaQuery(theme.breakpoints.up('md')); // ≥900px
-=======
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
 
   const getItemsPerPage = () => {
     if (isMobile) return 4;
     if (isTablet) return 6;
-<<<<<<< HEAD
     return 10; // full laptop
-=======
-    return categories.length;
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,11 +47,7 @@ export default function PopularCategories() {
   useEffect(() => {
     setItemsPerPage(getItemsPerPage());
     setCurrentPage(1);
-<<<<<<< HEAD
   }, [isMobile, isTablet, isLaptop]);
-=======
-  }, [isMobile, isTablet]);
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -68,48 +55,24 @@ export default function PopularCategories() {
   const totalPages = Math.ceil(categories.length / itemsPerPage);
 
   return (
-<<<<<<< HEAD
     <Box sx={{ py: { xs: 4, md: 6 }, backgroundColor: "#FAFAFA" }}>
-=======
-    <Box sx={{  py: { xs: 4, md: 6 }, backgroundColor: "#FAFAFA" }}>
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
       <Container maxWidth="lg">
         {/* Title + All Categories Button */}
         <Box
           sx={{
             display: 'flex',
-<<<<<<< HEAD
             flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
             alignItems: { xs: 'flex-start', sm: 'center' },
             mb: 6,
             gap: { xs: 2, sm: 0 }
-=======
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            mb: 6,
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
           }}
         >
           <Box sx={{ flex: 1, minWidth: 260 }}>
             <Typography variant="h4" fontWeight={700} gutterBottom>
-<<<<<<< HEAD
               Top Categories
             </Typography>
             <Typography variant="subtitle1" sx={{ color: '#6c757d', fontSize: '1.1rem' }}>
-=======
-                          Top Categories
-                        </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: '#6c757d',
-                fontSize: '1.1rem',
-              }}
-            >
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
               Explore our most popular learning topics
             </Typography>
           </Box>
@@ -130,7 +93,6 @@ export default function PopularCategories() {
               </IconButton>
             ) : (
               <Link to="/categories" style={{ textDecoration: 'none' }}>
-<<<<<<< HEAD
                 <Button
                   variant="outlined"
                   size="large"
@@ -151,29 +113,6 @@ export default function PopularCategories() {
                 >
                   All Categories
                 </Button>
-=======
-              
-                <Button 
-                 
-                variant="outlined" size="large"
-                sx={{
-    textTransform: "none",
-    fontWeight: 500,
-    border: "1px solid",
-    borderColor: "primary.main", // màu viền theo theme
-    borderRadius: 2,
-    px: 2,
-    py: 0.5,
-    color: "primary.main",
-    "&:hover": {
-      backgroundColor: "primary.main",
-      color: "#fff",
-    },
-  }}
-                >
-                            All Categories
-                          </Button>
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
               </Link>
             )}
           </Box>
@@ -184,17 +123,8 @@ export default function PopularCategories() {
           sx={{
             display: 'flex',
             flexWrap: 'wrap',
-<<<<<<< HEAD
             gap: { xs: 2, sm: 2.5, md: 3 },
             justifyContent: { xs: 'center', sm: 'space-around', md: 'space-between' },
-=======
-            gap: 2.5,
-            justifyContent: {
-              xs: 'center',
-              sm: 'center',
-              md: 'space-between',
-            },
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
           }}
         >
           {currentItems.map((cat, index) => (
@@ -204,15 +134,9 @@ export default function PopularCategories() {
               disableElevation
               sx={{
                 width: {
-<<<<<<< HEAD
                   xs: '44%', // 2 per row mobile
                   sm: '30%', // 3 per row tablet
                   md: '18%', // 5 per row laptop
-=======
-                  xs: '44%',
-                  sm: '30%',
-                  md: '18%',
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
                 },
                 aspectRatio: '1',
                 textTransform: 'none',

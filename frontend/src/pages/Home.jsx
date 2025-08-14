@@ -3,10 +3,6 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "./Footer.jsx";
 
-<<<<<<< HEAD
-=======
-// ⚠️ THÊM các dòng import còn thiếu dưới đây:
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
 import Banner from "../components/Banner";
 import PopularCategories from "../components/PopularCategories";
 import FeaturedCourses from "../components/FeaturedCourses";
@@ -19,7 +15,6 @@ import LatestArticles from "../components/LatestArticles";
 import CallToAction from "../components/CallToAction";
 import BlogCard from "../components/blog/BlogCard.jsx";
 
-<<<<<<< HEAD
 import { Box, Container } from "@mui/material";
 
 export default function Home() {
@@ -85,8 +80,6 @@ export default function Home() {
     </Box>
   );
 }
-=======
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
 
 const courses = [
   {
@@ -100,27 +93,3 @@ const courses = [
     image: "https://source.unsplash.com/400x300/?design,ui",
   },
 ];
-<<<<<<< HEAD
-=======
-
-export default function Home() {
-  return (
-    <div>
-      {/* <Navbar /> */}
-      <Banner />
-      <PopularCategories />
-      <FeaturedCourses />
-      <BannerWithTextAndImage />
-      <StatsSection />
-      <SkillSection />
-      <FeatureBanner />
-      <StudentFeedbacks />
-      <CallToAction />
-      <LatestArticles />
-
-      {/* Footer nên nằm trong cùng 1 div */}
-      <Footer />
-    </div>
-  );
-}
->>>>>>> 6016b22a4f722684f02e99cf3f5371caf5aed30b
