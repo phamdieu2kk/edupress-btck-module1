@@ -2,7 +2,6 @@ import React from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
 import { Link } from "react-router-dom";
 import bannerImg from "../assets/banner.jpg";
-import DownloadIcon from "@mui/icons-material/Download";
 import SchoolIcon from "@mui/icons-material/School";
 import { motion } from "framer-motion";
 
@@ -11,7 +10,7 @@ export default function Banner() {
     <Box
       sx={{
         width: "100%",
-        minHeight: { xs: "70vh", md: "80vh" },
+        minHeight: { xs: "70vh", md: "90vh" },
         backgroundImage: `url(${bannerImg})`,
         backgroundSize: "cover",
         backgroundPosition: "left center",
@@ -20,17 +19,17 @@ export default function Banner() {
         alignItems: "center",
       }}
     >
-      {/* Overlay mờ giúp dễ đọc chữ hơn */}
+      {/* Overlay */}
       <Box
         sx={{
           position: "absolute",
           inset: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.25)",
+          backgroundColor: "rgba(0, 0, 0, 0.1)",
           zIndex: 1,
         }}
       />
 
-      {/* Nội dung chính */}
+      {/* Nội dung */}
       <Container
         sx={{
           position: "relative",
@@ -47,53 +46,49 @@ export default function Banner() {
           transition={{ duration: 1 }}
           sx={{
             maxWidth: "600px",
-            color: "#fff",
-            textAlign: "left",
-            ml: { xs: 2, sm: 4, md: 6 },
+            textAlign: { xs: "center", md: "left" },
+            mx: { xs: "auto", md: 0 },
+            px: { xs: 2, sm: 3, md: 0 },
+            color: "black",
           }}
         >
+          {/* Tiêu đề */}
           <Typography
-            variant="h4"
+            variant="h3"
             sx={{
-              color: "black",
               fontWeight: "bold",
+              fontSize: "3rem", // luôn giữ to
+              lineHeight: 1.2,
               mb: 2,
-              fontSize: {
-                xs: "1.6rem",
-                sm: "2rem",
-                md: "2.5rem",
-                lg: "3rem",
-              },
-              textShadow: "1px 1px 3px rgba(0,0,0,0.1)",
             }}
           >
-            Build Skills with Online Cours
+            Build Skills with <br /> Online Course
           </Typography>
 
+          {/* Mô tả */}
           <Typography
             variant="body1"
             sx={{
-              color: "#eee",
-              fontSize: {
-                xs: "0.9rem",
-                sm: "1rem",
-                md: "1.1rem",
-              },
-              textShadow: "1px 1px 2px rgba(0,0,0,0.4)",
+              fontSize: "1.1rem",
+              fontWeight: 400,
+              maxWidth: "520px",
+              mx: { xs: "auto", md: 0 },
+              mb: { xs: 3, md: 0 },
             }}
           >
             We denounce with righteous indignation and dislike men who are so
             beguiled and demoralized that cannot trouble.
           </Typography>
 
-          {/* Nút CTA */}
+          {/* CTA */}
           <Box
             sx={{
               display: "flex",
               flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "center", sm: "flex-start" },
+              justifyContent: { xs: "center", md: "flex-start" },
+              alignItems: "center",
               gap: 2,
-              mt: 3, // cách xa đoạn mô tả
+              mt: 3,
             }}
           >
             <Button
@@ -108,34 +103,14 @@ export default function Banner() {
                 px: 4,
                 py: 1.5,
                 backgroundColor: "#f15d08ff",
+                color: "#fff",
                 "&:hover": {
                   backgroundColor: "#ee8345ff",
                   boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
                 },
               }}
             >
-              Khám phá khóa học
-            </Button>
-
-            <Button
-              component={Link}
-              to="/download"
-              variant="contained"
-              startIcon={<DownloadIcon />}
-              sx={{
-                borderRadius: 10,
-                textTransform: "none",
-                fontWeight: 500,
-                px: 4,
-                py: 1.5,
-                backgroundColor: "#43a047",
-                "&:hover": {
-                  backgroundColor: "#2e7d32",
-                  boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-                },
-              }}
-            >
-              Tải ứng dụng
+              Posts Comment
             </Button>
           </Box>
         </Box>

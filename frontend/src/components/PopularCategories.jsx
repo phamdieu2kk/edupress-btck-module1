@@ -1,190 +1,158 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  IconButton,
-  useTheme,
-  useMediaQuery,
-  Container,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import {
-  Brush, Code, Chat, Videocam, PhotoCamera,
-  Campaign, Create, AttachMoney, Science, NetworkWifi
-} from '@mui/icons-material';
-import { Link } from 'react-router-dom';
-import CustomPagination from './CustomPagination';
+import React, { useEffect, useState } from 'react';
+import { Box, Container, Typography, Button, useMediaQuery, useTheme } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import BrushIcon from '@mui/icons-material/Brush';
+import CodeIcon from '@mui/icons-material/Code';
+import ChatIcon from '@mui/icons-material/Chat';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import CreateIcon from '@mui/icons-material/Create';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ScienceIcon from '@mui/icons-material/Science';
+import NetworkWifiIcon from '@mui/icons-material/NetworkWifi';
+import axios from 'axios';
 
-const categories = [
-  { title: "Art & Design", icon: <Brush fontSize="large" />, count: "2 Courses" },
-  { title: "Communication", icon: <Chat fontSize="large" />, count: "1 Course" },
-  { title: "Content Writing", icon: <Create fontSize="large" />, count: "1 Course" },
-  { title: "Development", icon: <Code fontSize="large" />, count: "1 Course" },
-  { title: "Finance & Bank", icon: <AttachMoney fontSize="large" />, count: "1 Course" },
-  { title: "Marketing", icon: <Campaign fontSize="large" />, count: "2 Courses" },
-  { title: "Network", icon: <NetworkWifi fontSize="large" />, count: "1 Course" },
-  { title: "Photography", icon: <PhotoCamera fontSize="large" />, count: "1 Course" },
-  { title: "Videography", icon: <Videocam fontSize="large" />, count: "1 Course" },
-  { title: "Science", icon: <Science fontSize="large" />, count: "1 Course" },
-];
-
-export default function PopularCategories() {
+// Chỉ map các category thực tế có trong DB
+const iconMap = {
+  "Art & Design": <BrushIcon fontSize="large" />,
+  Development: <CodeIcon fontSize="large" />,
+  Communication: <ChatIcon fontSize="large" />,
+  Videography: <VideocamIcon fontSize="large" />,
+  Photography: <PhotoCameraIcon fontSize="large" />,
+  Marketing: <CampaignIcon fontSize="large" />,
+  "Content Writing": <CreateIcon fontSize="large" />,
+  Finance: <AttachMoneyIcon fontSize="large" />,
+  Science: <ScienceIcon fontSize="large" />,
+  Network: <NetworkWifiIcon fontSize="large" />,
+};
+ 
+const PopularCategories = () => {
+  const [categories, setCategories] = useState([]);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // <600px
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); // 600-900px
-  const isLaptop = useMediaQuery(theme.breakpoints.up('md')); // ≥900px
+  const isTabletOrMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
-  const getItemsPerPage = () => {
-    if (isMobile) return 4;
-    if (isTablet) return 6;
-    return 10; // full laptop
+  const fetchCourses = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/courses?limit=50');
+      const courses = Array.isArray(res.data.courses) ? res.data.courses : [];
+
+      // Đếm số lượng khóa học theo category
+      const countObj = {};
+      courses.forEach(course => {
+        if (course.category) {
+          countObj[course.category] = (countObj[course.category] || 0) + 1;
+        }
+      });
+
+      // Chỉ giữ category có icon
+      const catArray = Object.keys(countObj)
+        .filter(cat => iconMap[cat])
+        .map(cat => ({
+          title: cat,
+          count: countObj[cat],
+          icon: iconMap[cat],
+        }));
+
+      setCategories(catArray);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      setCategories([]);
+    }
   };
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(getItemsPerPage());
-
   useEffect(() => {
-    setItemsPerPage(getItemsPerPage());
-    setCurrentPage(1);
-  }, [isMobile, isTablet, isLaptop]);
+    fetchCourses();
+  }, []);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = categories.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(categories.length / itemsPerPage);
+  const handleCategoryClick = category => {
+    navigate(`/courses?category=${encodeURIComponent(category)}`);
+  };
 
   return (
-    <Box sx={{ py: { xs: 4, md: 6 }, backgroundColor: "#FAFAFA" }}>
-      <Container maxWidth="lg">
-        {/* Title + All Categories Button */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            mb: 6,
-            gap: { xs: 2, sm: 0 }
-          }}
-        >
-          <Box sx={{ flex: 1, minWidth: 260 }}>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-              Top Categories
-            </Typography>
-            <Typography variant="subtitle1" sx={{ color: '#6c757d', fontSize: '1.1rem' }}>
-              Explore our most popular learning topics
-            </Typography>
-          </Box>
+    <Box sx={{ bgcolor: '#fafafa', py: 6 }}>
+      <Container>
+         <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: { xs: "flex-start", sm: "center" },
+        flexDirection: { xs: "column", sm: "row" },
+        gap: 2,
+        mb: 4,
+      }}
+    >
+      <Box>
+        <Typography variant="h4" fontWeight={700} gutterBottom>
+          Top Categories
+        </Typography>
+        <Typography variant="subtitle1" sx={{ color: '#6c757d', fontSize: '1.1rem' }}>
+          Explore our most popular learning topics
+        </Typography>
+      </Box>
 
-          <Box sx={{ minWidth: 'auto' }}>
-            {isMobile ? (
-              <IconButton
-                component={Link}
-                to="/categories"
-                sx={{
-                  color: '#1976d2',
-                  border: '1px solid #1976d2',
-                  borderRadius: 2,
-                  p: 1,
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
-            ) : (
-              <Link to="/categories" style={{ textDecoration: 'none' }}>
-                <Button
+      <Button
                   variant="outlined"
                   size="large"
                   sx={{
                     textTransform: "none",
                     fontWeight: 500,
-                    border: "1px solid",
-                    borderColor: "primary.main",
                     borderRadius: 2,
-                    px: 2,
-                    py: 0.5,
+                    px: 3,
+                    py: 1,
                     color: "primary.main",
-                    "&:hover": {
-                      backgroundColor: "primary.main",
-                      color: "#fff",
-                    },
+                    borderColor: "primary.main",
+                    "&:hover": { backgroundColor: "primary.main", color: "#fff" },
+                    mt: { xs: 2, sm: 0 }, // margin top khi trên mobile
                   }}
+                  onClick={() => navigate("/courses")}
                 >
-                  All Categories
+                  All Courses
                 </Button>
-              </Link>
-            )}
-          </Box>
-        </Box>
+    </Box>
 
-        {/* Category Cards */}
         <Box
           sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: { xs: 2, sm: 2.5, md: 3 },
-            justifyContent: { xs: 'center', sm: 'space-around', md: 'space-between' },
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(5, 1fr)' },
+            gap: { xs: 2, md: 3 },
           }}
         >
-          {currentItems.map((cat, index) => (
+          {categories.map((cat, index) => (
             <Button
               key={index}
               variant="outlined"
-              disableElevation
+              onClick={() => handleCategoryClick(cat.title)}
               sx={{
-                width: {
-                  xs: '44%', // 2 per row mobile
-                  sm: '30%', // 3 per row tablet
-                  md: '18%', // 5 per row laptop
-                },
-                aspectRatio: '1',
                 textTransform: 'none',
                 borderRadius: 3,
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: { xs: 'row', md: 'column' },
                 alignItems: 'center',
-                justifyContent: 'center',
-                px: 1,
-                py: 3,
-                boxShadow: 0,
-                border: '1px solid #e0e0e0',
-                backgroundColor: '#fff',
-                transition: '0.25s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3,
-                  backgroundColor: '#f5f5f5',
-                }
+                justifyContent: { xs: 'flex-start', md: 'center' },
+                py: { xs: 2, md: 3 },
+                px: { xs: 2, md: 1 },
+                '&:hover': { transform: 'translateY(-4px)', boxShadow: 3, backgroundColor: '#f5f5f5' },
               }}
             >
-              <Box sx={{ color: '#ed6910ff', mb: 1 }}>{cat.icon}</Box>
-              <Typography
-                variant="subtitle1"
-                fontWeight={600}
-                align="center"
-                sx={{ fontSize: '1.1rem', color: '#333' }}
-              >
-                {cat.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                align="center"
-                sx={{ fontSize: '0.9rem', color: '#666' }}
-              >
-                {cat.count}
-              </Typography>
+              <Box sx={{ color: '#ed6910ff', mr: { xs: 2, md: 0 }, mb: { xs: 0, md: 1 } }}>
+                {cat.icon}
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', md: 'center' } }}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ fontSize: '1.1rem', color: '#333' }}>
+                  {cat.title}
+                </Typography>
+                <Typography variant="body2" sx={{ fontSize: '0.9rem', color: '#666' }}>
+                  {cat.count} course{cat.count !== 1 ? 's' : ''}
+                </Typography>
+              </Box>
             </Button>
           ))}
         </Box>
-
-        {/* Pagination */}
-        <CustomPagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onChange={(e, page) => setCurrentPage(page)}
-        />
       </Container>
     </Box>
   );
-}
+};
+
+export default PopularCategories;

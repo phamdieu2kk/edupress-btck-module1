@@ -3,15 +3,17 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
-const connectDB = require('./config/db');
-
-const app = express();
+const mongoose = require('mongoose');
 
 // ===== Import routes =====
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/users.routes');
-const courseRoutes = require('./routes/courses.routes'); // courses từ backend cũ
-const blogRoutes = require('./routes/blog.routes'); // blogs mới
+const courseRoutes = require('./routes/courses.routes'); 
+const blogRoutes = require('./routes/blog.routes'); 
+const lessonRoutes = require('./routes/lessons.routes'); 
+const instructorRoutes = require('./routes/instructors.routes');
+
+const app = express();
 
 // ===== Middlewares =====
 app.use(express.json());
@@ -21,19 +23,31 @@ app.use(cors({
   credentials: true
 }));
 app.use(morgan('dev'));
-
-// ===== Connect Database =====
-connectDB(process.env.MONGO_URI || 'mongodb://localhost:27017/edupress');
-
-// ===== Health Check =====
-app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.disable('etag');
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 
 // ===== Routes =====
+app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/courses', courseRoutes); // courses API
-app.use('/api/blogs', blogRoutes); // blogs API
+app.use('/api/courses', courseRoutes);
+app.use('/api/blogs', blogRoutes);
+app.use('/api/lessons', lessonRoutes);
+app.use('/api/instructors', instructorRoutes);
 
-// ===== Start Server =====
+// ===== Connect Database & Start Server =====
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/edupress';
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log('✅ MongoDB connected');
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1);
+  });

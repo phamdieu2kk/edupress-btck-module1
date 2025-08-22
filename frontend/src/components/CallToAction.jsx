@@ -25,21 +25,21 @@ const CallToAction = () => {
     >
       <Container maxWidth="lg">
         <Box
-          sx={{
-            borderRadius: "24px",
-            background: "linear-gradient(90deg, #eba3f7ff 0%, #9ad5f1ff 100%)",
-            boxShadow: 3,
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: { xs: 2, sm: 4, md: 6 },
-            py: { xs: 4, sm: 5, md: 6 },
-            gap: { xs: 3, md: 4 },
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
+  sx={{
+    borderRadius: 4,
+    background: "linear-gradient(90deg, #eba3f7 0%, #9ad5f1 100%)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+    display: "flex",
+    flexDirection: { xs: "column", md: "row" },
+    alignItems: "center",
+    justifyContent: "space-between",
+    px: { xs: 4, md: 8 }, // tăng padding ngang
+    py: { xs: 6, md: 8 }, // tăng padding dọc
+    gap: { xs: 3, md: 4 },
+    overflow: "hidden",
+  }}
+>
+
           {/* Left Content */}
           <Box
             sx={{

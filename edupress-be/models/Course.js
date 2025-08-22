@@ -10,9 +10,14 @@ const courseSchema = new mongoose.Schema(
     duration: { type: String },
     level: { type: String },
     lessons: { type: Number },
-    category: { type: String }
+    category: { type: String },
+    instructor: { type: String, required: true },
+
+    // ✅ Thêm rating để filter/review
+    rating: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Course', courseSchema);
+
+module.exports = mongoose.model("Course", courseSchema);

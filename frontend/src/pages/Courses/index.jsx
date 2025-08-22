@@ -1,218 +1,112 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Container,
-  IconButton,
-  Drawer,
-  Button,
-  Pagination,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+// import React, { useState, useEffect } from "react";
+// import { Box, Container, Typography, TextField, InputAdornment, ToggleButton, ToggleButtonGroup, Pagination, Stack, CircularProgress } from "@mui/material";
+// import GridViewIcon from "@mui/icons-material/GridView";
+// import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+// import SearchIcon from "@mui/icons-material/Search";
+// import axios from "axios";
+// import CourseCard from "./CourseCard";
+// import FilterSidebar from "./FilterSidebar";
 
-import CourseCard from "@/components/courses/CourseCard";
-import FilterSidebar from "@/components/courses/FilterSidebar";
-import CourseTopbar from "@/components/courses/CourseTopbar";
-import Breadcrumbs from "../../components/Breadcrumbs";
-import Footer from "../Footer";
-import courseList from "@/data/mock-data";
+// const CoursePage = () => {
+//   const [courses, setCourses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [viewMode, setViewMode] = useState("grid");
+//   const [searchText, setSearchText] = useState("");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const itemsPerPage = 9;
+//   const [filter, setFilter] = useState({ category: [], instructor: [], price: "All", review: 0, level: "All levels" });
 
-const CoursePage = () => {
-  const [filter, setFilter] = useState({
-    category: [],
-    instructor: [],
-    price: "",
-    level: "",
-    review: 0,
-  });
+//   useEffect(() => {
+//     const fetchCourses = async () => {
+//       try {
+//         const res = await axios.get("http://localhost:5000/api/courses");
+//         setCourses(res.data);
+//       } catch (err) {
+//         console.error(err);
+//         setError("Cannot load courses");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchCourses();
+//   }, []);
 
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchText, setSearchText] = useState("");
-  const [sortOption, setSortOption] = useState("new");
-  const [viewMode, setViewMode] = useState("grid");
+//   const filteredCourses = courses.filter(course => {
+//     const matchesSearch = course.title.toLowerCase().includes(searchText.toLowerCase());
+//     const matchesCategory = filter.category.length === 0 || filter.category.includes(course.category);
+//     const matchesInstructor = filter.instructor.length === 0 || filter.instructor.includes(course.instructor);
+//     const matchesPrice =
+//       filter.price === "All" ||
+//       (filter.price === "Free" && course.price === 0) ||
+//       (filter.price === "Paid" && course.price > 0);
+//     const matchesLevel = filter.level === "All levels" || course.level === filter.level;
+//     const matchesReview = filter.review === 0 || Math.floor(course.rating || 0) === filter.review;
+//     return matchesSearch && matchesCategory && matchesInstructor && matchesPrice && matchesLevel && matchesReview;
+//   });
 
-  const itemsPerPage = 8;
+//   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+//   const currentCourses = filteredCourses.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const toggleDrawer = () => setMobileOpen(!mobileOpen);
+//   if (loading) return <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}><CircularProgress /></Box>;
+//   if (error) return <Typography color="error" sx={{ mt: 4 }}>{error}</Typography>;
+//   if (!filteredCourses.length) return <Typography sx={{ mt: 4 }}>No courses found</Typography>;
 
-  const handleFilterChange = (key, value) => {
-    setFilter((prev) => ({ ...prev, [key]: value }));
-  };
+//   return (
+//     <Container sx={{ mt: 4 }}>
+//       {/* Topbar */}
+//       <Box mb={3} display="flex" justifyContent="space-between" flexWrap="wrap" gap={2}>
+//         <Typography variant="h4" fontWeight="bold">All Courses</Typography>
+//         <Box display="flex" alignItems="center" gap={1.5}>
+//           <TextField
+//             variant="outlined"
+//             size="small"
+//             placeholder="Search courses..."
+//             value={searchText}
+//             onChange={(e) => setSearchText(e.target.value)}
+//             sx={{ "& .MuiOutlinedInput-root": { borderRadius: "25px" } }}
+//             InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon /></InputAdornment>) }}
+//           />
+//           <ToggleButtonGroup
+//             size="small"
+//             value={viewMode}
+//             exclusive
+//             onChange={(e, newView) => newView && setViewMode(newView)}
+//             aria-label="view mode"
+//             sx={{ backgroundColor: "#f7f7f7", border: "1px solid #ddd", borderRadius: 6 }}
+//           >
+//             <ToggleButton value="grid" aria-label="grid view"><GridViewIcon fontSize="small" /></ToggleButton>
+//             <ToggleButton value="list" aria-label="list view"><FormatListBulletedIcon fontSize="small" /></ToggleButton>
+//           </ToggleButtonGroup>
+//         </Box>
+//       </Box>
 
-  useEffect(() => {
-    setCurrentPage(1); // reset page khi filter thay đổi
-  }, [filter, searchText]);
+//       {/* Main layout */}
+//       <Box display="flex" flexDirection={{ xs: "column", lg: "row" }} gap={3}>
+//         <Box flex={1}>
+//           {viewMode === "grid" ? (
+//             <Box display="grid" gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" }} gap={3}>
+//               {currentCourses.map((course) => <CourseCard key={course._id} course={course} variant="grid" />)}
+//             </Box>
+//           ) : (
+//             <Stack spacing={3}>
+//               {currentCourses.map((course) => <CourseCard key={course._id} course={course} variant="list" />)}
+//             </Stack>
+//           )}
+//           {totalPages > 1 && (
+//             <Box mt={5} display="flex" justifyContent="center">
+//               <Pagination count={totalPages} page={currentPage} onChange={(e, val) => setCurrentPage(val)} color="primary" />
+//             </Box>
+//           )}
+//         </Box>
 
-  const filteredCourses = courseList
-    .filter((course) => {
-      const { category, instructor, price, level, review } = filter;
+//         {/* Sidebar */}
+//         <Box sx={{ width: { xs: "100%", lg: 300 } }}>
+//           <FilterSidebar filter={filter} onFilterChange={(key, value) => setFilter({ ...filter, [key]: value })} />
+//         </Box>
+//       </Box>
+//     </Container>
+//   );
+// };
 
-      if (category.length && !category.includes(course.category)) return false;
-      if (instructor.length && !instructor.includes(course.instructor)) return false;
-      if (price === "Free" && course.price > 0) return false;
-      if (price === "Paid" && course.price === 0) return false;
-      if (level && level !== "All levels" && course.level !== level) return false;
-      if (review > 0 && course.rating < review) return false;
-
-      if (
-        searchText &&
-        !course.title.toLowerCase().includes(searchText.toLowerCase())
-      )
-        return false;
-
-      return true;
-    })
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "popular":
-          return b.students - a.students;
-        case "priceLowHigh":
-          return a.price - b.price;
-        case "priceHighLow":
-          return b.price - a.price;
-        case "new":
-        default:
-          return new Date(b.publishedAt) - new Date(a.publishedAt);
-      }
-    });
-
-  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCourses = filteredCourses.slice(indexOfFirstItem, indexOfLastItem);
-
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  return (
-    <div>
-      <Breadcrumbs
-        paths={[
-          { name: "Home", href: "/" },
-          { name: "All Courses", href: "/courses" },
-        ]}
-      />
-
-      <Box py={4}>
-        <Container maxWidth="lg">
-          {/* Header */}
-          <Box
-            mb={3}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h4" fontWeight="bold">
-              All Courses
-            </Typography>
-            <IconButton
-              sx={{ display: { md: "none" } }}
-              onClick={toggleDrawer}
-              aria-label="filter"
-            >
-              <MenuIcon />
-            </IconButton>
-          </Box>
-
-          {/* Layout */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              gap: 4,
-            }}
-          >
-            {/* Main content */}
-            <Box sx={{ flex: { xs: "1 1 100%", md: "0 0 70%" } }}>
-              <CourseTopbar
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                sortOption={sortOption}
-                setSortOption={setSortOption}
-                searchText={searchText}
-                setSearchText={setSearchText}
-              />
-
-              <Box mt={3}>
-                {viewMode === "grid" ? (
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: {
-                        xs: "1fr",
-                        sm: "1fr 1fr",
-                      },
-                      gap: 3,
-                    }}
-                  >
-                    {currentCourses.map((course) => (
-                      <CourseCard key={course.id} course={course} />
-                    ))}
-                  </Box>
-                ) : (
-                  <Box display="flex" flexDirection="column" gap={2}>
-                    {currentCourses.map((course) => (
-                      <CourseCard key={course.id} course={course} variant="list" />
-                    ))}
-                  </Box>
-                )}
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <Box display="flex" justifyContent="center" mt={4}>
-                    <Pagination
-                      count={totalPages}
-                      page={currentPage}
-                      onChange={handlePageChange}
-                      color="primary"
-                    />
-                  </Box>
-                )}
-              </Box>
-            </Box>
-
-            {/* Sidebar Filter */}
-            <Box
-              sx={{
-                flex: { xs: "0 0 100%", md: "0 0 30%" },
-                display: { xs: "none", md: "block" },
-                position: "sticky",
-                top: 100,
-                height: "fit-content",
-              }}
-            >
-              <FilterSidebar filter={filter} onFilterChange={handleFilterChange} />
-            </Box>
-          </Box>
-
-          {/* Mobile Drawer Filter */}
-          <Drawer
-            anchor="right"
-            open={mobileOpen}
-            onClose={toggleDrawer}
-            sx={{ display: { md: "none" } }}
-          >
-            <Box width={300} p={2}>
-              <FilterSidebar filter={filter} onFilterChange={handleFilterChange} />
-              <Button
-                fullWidth
-                onClick={toggleDrawer}
-                variant="contained"
-                sx={{ mt: 2 }}
-              >
-                Apply
-              </Button>
-            </Box>
-          </Drawer>
-        </Container>
-      </Box>
-
-      <Footer />
-    </div>
-  );
-};
-
-export default CoursePage;
+// export default CoursePage;

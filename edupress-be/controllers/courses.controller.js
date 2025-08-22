@@ -4,12 +4,58 @@ const Enrollment = require('../models/Enrollment');
 const Review = require('../models/Review');
 
 // Public: danh sách khoá học APPROVED (+search ?q=)
+// exports.listCourses = async (req, res) => {
+//   const q = { status: 'APPROVED' };
+//   if (req.query.q) q.title = { $regex: req.query.q, $options: 'i' };
+//   const courses = await Course.find(q).sort({ createdAt: -1 }).populate('provider', 'name');
+//   res.json(courses);
+// };
+
+// controllers/courseController.js
+// controllers/courseController.js
+
+
 exports.listCourses = async (req, res) => {
-  const q = { status: 'APPROVED' };
-  if (req.query.q) q.title = { $regex: req.query.q, $options: 'i' };
-  const courses = await Course.find(q).sort({ createdAt: -1 }).populate('provider', 'name');
-  res.json(courses);
+  try {
+    const q = { status: "APPROVED" };
+
+    // Search by title
+    if (req.query.q) {
+      q.title = { $regex: req.query.q, $options: "i" };
+    }
+
+    // Filter by category (support multiple categories)
+    if (req.query.category) {
+      const categories = req.query.category.split(",").map((c) => c.trim());
+      q.category = { $in: categories }; // match bất kỳ category nào trong mảng
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const skip = (page - 1) * limit;
+
+    const totalCourses = await Course.countDocuments(q);
+
+    const courses = await Course.find(q)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("provider", "name");
+
+    const totalPages = Math.ceil(totalCourses / limit);
+
+    res.json({
+      courses,
+      pagination: { totalPages },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
+
+
+
 
 // Public: chi tiết khoá học (không trả nội dung bài học)
 exports.getCourse = async (req, res) => {

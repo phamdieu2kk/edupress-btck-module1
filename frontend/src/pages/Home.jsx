@@ -13,68 +13,66 @@ import FeatureBanner from "../components/FeatureBanner";
 import StudentFeedbacks from "../components/StudentFeedbacks";
 import LatestArticles from "../components/LatestArticles";
 import CallToAction from "../components/CallToAction";
-import BlogCard from "../components/blog/BlogCard.jsx";
 
 import { Box, Container } from "@mui/material";
 
 export default function Home() {
   return (
-    <Box sx={{ width: "100%", minHeight: "100vh", bgcolor: "#f9f9f9" }}>
+    <Box
+      sx={{
+        width: "100%",
+        minHeight: "100vh",
+        bgcolor: "#f9f9f9",
+        overflowX: "hidden",
+      }}
+    >
       {/* Navbar */}
       {/* <Navbar /> */}
 
-      {/* Banner */}
+      {/* Banner (không margin top) */}
       <Box component="section" sx={{ width: "100%" }}>
         <Banner />
       </Box>
 
-      {/* Popular Categories */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      {/* Sections với mt: 2 (16px) */}
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <PopularCategories />
       </Container>
 
-      {/* Featured Courses */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <FeaturedCourses courses={courses} />
       </Container>
 
-      {/* Banner with Text and Image */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <BannerWithTextAndImage />
       </Container>
 
-      {/* Stats Section */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <StatsSection />
       </Container>
 
-      {/* Skill Section */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <SkillSection />
       </Container>
 
-      {/* Feature Banner */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <FeatureBanner />
       </Container>
 
-      {/* Student Feedbacks */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <StudentFeedbacks />
       </Container>
 
-      {/* Call To Action */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <CallToAction />
       </Container>
 
-      {/* Latest Articles */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <LatestArticles />
       </Container>
 
-      {/* Footer */}
-      <Box component="footer" sx={{ width: "100%", mt: 6 }}>
+      {/* Footer (mt: 4 để thoáng hơn) */}
+      <Box component="footer" sx={{ width: "100%", mt: 4 }}>
         <Footer />
       </Box>
     </Box>

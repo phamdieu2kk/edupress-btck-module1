@@ -14,3 +14,4 @@ router.get('/:id/lessons', verifyToken, c.courseLessons);  // GET  /api/courses/
 router.post('/:id/reviews', verifyToken, c.reviewCourse);  // POST /api/courses/:id/reviews
 
 module.exports = router;
+ 

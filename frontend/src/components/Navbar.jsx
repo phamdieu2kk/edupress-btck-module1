@@ -1,5 +1,5 @@
 // src/components/Navbar.jsx
-import React from "react";
+import React, { useState, useContext } from "react";
 import {
   AppBar,
   Toolbar,
@@ -13,9 +13,9 @@ import {
   Stack,
   Menu,
   MenuItem,
-  Typography,
-  TextField,
-  InputAdornment,
+  Avatar,
+  Divider,
+  InputBase,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -23,99 +23,128 @@ import {
   Menu as MenuIcon,
   ArrowDropDown as ArrowDropDownIcon,
   Search as SearchIcon,
-  Brightness4 as Brightness4Icon,
 } from "@mui/icons-material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const theme = useTheme();
-  const isTabletUp = useMediaQuery(theme.breakpoints.up("sm")); // ≥600px
-  const isLaptopUp = useMediaQuery(theme.breakpoints.up("md")); // ≥900px
 
-  const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [anchorElPage, setAnchorElPage] = React.useState(null);
-  const [searchText, setSearchText] = React.useState("");
+  // ✅ Định nghĩa 5 mức breakpoint
+  const isTabletUp = useMediaQuery(theme.breakpoints.up("sm")); // >=576
+  const isLaptopUp = useMediaQuery(theme.breakpoints.up("md")); // >=768
+  const isLargePcUp = useMediaQuery(theme.breakpoints.up("lg")); // >=992
+  const isXlUp = useMediaQuery(theme.breakpoints.up("xl")); // >=1200
+  const isXxlUp = useMediaQuery(theme.breakpoints.up("xxl")); // >=1400 (custom trong theme)
 
-  const handleOpen = (setter) => (event) => setter(event.currentTarget);
-  const handleClose = (setter) => () => setter(null);
-  const isActive = (path) => location.pathname === path;
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [anchorElPage, setAnchorElPage] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
-  const navLinkStyle = (active) => ({
-    color: active ? "#ff6e00" : "#555",
-    backgroundColor: active ? "#f0f0f0" : "transparent",
-    fontWeight: 600,
-    fontFamily: "sans-serif",
-    textTransform: "none",
-    borderRadius: "4px",
-    padding: "8px 16px",
-    fontSize: "15px",
-    "&:hover": { backgroundColor: "#f0f0f0" },
-  });
-
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user, logout } = useContext(AuthContext);
   const isLoggedIn = !!user;
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    window.location.reload();
+    logout();
+    navigate("/");
   };
+
+  const handleOpen = (setter) => (event) => setter(event.currentTarget);
+  const handleClose = (setter) => () => setter(null);
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
+  const pageLinks = [
+    { label: "About", path: "/about" },
+    { label: "Contact", path: "/contact" },
+    { label: "FAQ", path: "/faq" },
+  ];
 
   const drawerLinks = [
     { label: "Home", path: "/" },
     { label: "Courses", path: "/courses" },
     { label: "Blog", path: "/blog" },
-    { label: "Contact", path: "/contact" },
-    { label: "Faq", path: "/faqs" },
+    { label: "Premium Theme", path: "/premium-themes" },
   ];
 
-  const pageLinks = [
-    { label: "Contact", path: "/contact" },
-    { label: "Faq", path: "/faqs" },
-    { label: "Error", path: "/error" },
-  ];
+  // Style link
+  const navLinkStyle = (active) => ({
+    position: "relative",
+    color: active ? theme.palette.primary.main : theme.palette.text.primary,
+    fontWeight: 600,
+    fontFamily: "Inter, sans-serif",
+    textTransform: "none",
+    borderRadius: 0,
+    padding: "20px 18px",
+    fontSize: "15px",
+    transition: "color 0.3s ease",
+    "&::after": {
+      content: '""',
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+      bottom: 10,
+      width: active ? "50%" : "0%",
+      height: "2px",
+      backgroundColor: theme.palette.primary.main,
+      transition: "width 0.3s ease",
+    },
+    "&:hover": {
+      color: theme.palette.primary.main,
+    },
+    "&:hover::after": {
+      width: "50%",
+    },
+  });
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
-        position="static"
-        color="default"
+        position="sticky"
+        color="inherit"
         elevation={0}
-        sx={{ borderBottom: "1px solid #e0e0e0", backgroundColor: "#fff" }}
+        sx={{
+          borderBottom: "1px solid #eee",
+          backgroundColor: "#fff",
+        }}
       >
         <Toolbar
           sx={{
-            maxWidth: "1200px",
+            maxWidth: isXxlUp ? "1600px" : "1320px",
             width: "100%",
             mx: "auto",
-            py: { xs: 1, sm: 1.2, md: 1.5 },
-            px: { xs: 1.5, sm: 2, md: 2 },
+            py: { xs: 1, sm: 1.5 },
+            px: { xs: 1.5, sm: 3 },
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
           {/* Logo */}
-          <Box sx={{ display: "flex", alignItems: "center", mr: { xs: 2, md: 4 } }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <Link to="/">
               <img
                 src={logo}
                 alt="EduPress Logo"
                 style={{
-                  width: isLaptopUp ? 150 : isTabletUp ? 120 : 100,
+                  width: isLargePcUp ? 170 : isLaptopUp ? 150 : isTabletUp ? 120 : 100,
+                  cursor: "pointer",
                 }}
               />
             </Link>
           </Box>
 
-          {/* Desktop Menu */}
-          {isTabletUp && (
+          {/* Full Menu: từ laptop (>=768) trở lên */}
+          {isLaptopUp && (
             <Box
               sx={{
                 display: "flex",
-                gap: { xs: 1, sm: 2, md: 3 },
+                gap: { xs: 0.5, sm: 1.5, md: 2 },
                 alignItems: "center",
                 flexGrow: 1,
                 justifyContent: "center",
@@ -124,156 +153,266 @@ export default function Navbar() {
               <Button component={Link} to="/" sx={navLinkStyle(isActive("/"))}>
                 Home
               </Button>
-              <Button component={Link} to="/courses" sx={navLinkStyle(location.pathname.startsWith("/courses"))}>
+              <Button
+                component={Link}
+                to="/courses"
+                sx={navLinkStyle(isActive("/courses"))}
+              >
                 Courses
               </Button>
-              <Button component={Link} to="/blog" sx={navLinkStyle(isActive("/blog"))}>
+              <Button
+                component={Link}
+                to="/blog"
+                sx={navLinkStyle(isActive("/blog"))}
+              >
                 Blog
               </Button>
-              <Button onClick={handleOpen(setAnchorElPage)} endIcon={<ArrowDropDownIcon />} sx={navLinkStyle(location.pathname.startsWith("/page"))}>
+              <Button
+                onClick={handleOpen(setAnchorElPage)}
+                endIcon={<ArrowDropDownIcon />}
+                sx={navLinkStyle(pageLinks.some((p) => isActive(p.path)))}
+              >
                 Page
               </Button>
-              <Menu anchorEl={anchorElPage} open={Boolean(anchorElPage)} onClose={handleClose(setAnchorElPage)}>
+              <Menu
+                anchorEl={anchorElPage}
+                open={Boolean(anchorElPage)}
+                onClose={handleClose(setAnchorElPage)}
+              >
                 {pageLinks.map((link) => (
-                  <MenuItem key={link.path} component={Link} to={link.path} onClick={handleClose(setAnchorElPage)}>
+                  <MenuItem
+                    key={link.path}
+                    component={Link}
+                    to={link.path}
+                    onClick={handleClose(setAnchorElPage)}
+                  >
                     {link.label}
                   </MenuItem>
                 ))}
               </Menu>
-              <Button component={Link} to="/premium-themes" sx={navLinkStyle(isActive("/premium-themes"))}>
+              <Button
+                component={Link}
+                to="/premium-themes"
+                sx={navLinkStyle(isActive("/premium-themes"))}
+              >
                 Premium Theme
               </Button>
             </Box>
           )}
 
-          {/* Desktop Auth + Search + DarkMode */}
-          {isTabletUp && (
+          {/* Desktop Auth + Search */}
+          {isLaptopUp && (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <IconButton sx={{ border: "1px solid #e0e0e0", borderRadius: "50%", p: "8px", color: "#800080" }}>
-                <Brightness4Icon />
-              </IconButton>
-
-              <TextField
-                size="small"
-                variant="outlined"
-                placeholder="Search courses..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                sx={{ width: 200 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
+              {/* Search */}
+              <IconButton
+                onClick={() => setSearchOpen((prev) => !prev)}
+                sx={{
+                  border: "1px solid #eee",
+                  bgcolor: "#fafafa",
+                  "&:hover": { bgcolor: "#f0f0f0" },
                 }}
-              />
+              >
+                <SearchIcon sx={{ color: theme.palette.text.secondary }} />
+              </IconButton>
+              {searchOpen && (
+                <InputBase
+                  placeholder="Search courses..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  sx={{
+                    border: "1px solid #ddd",
+                    borderRadius: "20px",
+                    px: 2,
+                    py: 0.7,
+                    ml: 1,
+                    width: 220,
+                    fontSize: "14px",
+                  }}
+                />
+              )}
 
               {!isLoggedIn ? (
                 <Button
                   component={Link}
                   to="/auth"
                   sx={{
-                    color: "#555",
+                    backgroundColor: theme.palette.primary.main,
+                    color: "#fff",
                     textTransform: "none",
                     fontWeight: 600,
-                    borderRadius: "20px",
-                    border: "1px solid #e0e0e0",
-                    px: 2,
+                    borderRadius: "30px",
+                    px: 3,
                     py: 1,
-                    fontFamily: "sans-serif",
-                    "&:hover": { backgroundColor: "#f0f0f0", border: "1px solid #e0e0e0" },
+                    fontFamily: "Inter, sans-serif",
+                    "&:hover": {
+                      backgroundColor: theme.palette.primary.dark,
+                    },
                   }}
                 >
                   Login / Register
                 </Button>
               ) : (
                 <>
-                  <Typography sx={{ fontWeight: 600, mr: 2 }}>{user.name}</Typography>
-                  <Button
-                    onClick={handleLogout}
-                    variant="outlined"
-                    sx={{
-                      textTransform: "none",
-                      fontWeight: 500,
-                      fontFamily: "sans-serif",
-                      color: "#555",
-                      borderColor: "#e0e0e0",
-                    }}
+                  <IconButton onClick={handleOpen(setAnchorElUser)}>
+                    <Avatar
+                      sx={{
+                        bgcolor: theme.palette.primary.main,
+                        color: "#fff",
+                        width: 36,
+                        height: 36,
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {user.fullName?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorElUser}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleClose(setAnchorElUser)}
                   >
-                    Logout
-                  </Button>
+                    <MenuItem disabled>{user.fullName}</MenuItem>
+                    <Divider />
+                    <MenuItem component={Link} to="/profile">
+                      Profile
+                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                  </Menu>
                 </>
               )}
             </Stack>
           )}
 
-          {/* Mobile Menu Icon */}
-          {!isTabletUp && (
-            <IconButton edge="end" onClick={() => setOpenDrawer(true)}>
-              <MenuIcon />
-            </IconButton>
+          {/* Mobile + Tablet: chỉ logo + icon */}
+          {!isLaptopUp && (
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={{ pr: { xs: 1, sm: 2 } }} // Updated padding
+            >
+              {isLoggedIn && (
+                <IconButton onClick={handleOpen(setAnchorElUser)}>
+                  <Avatar
+                    sx={{
+                      bgcolor: theme.palette.primary.main,
+                      color: "#fff",
+                      width: 32,
+                      height: 32,
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    {user.fullName?.charAt(0).toUpperCase()}
+                  </Avatar>
+                </IconButton>
+              )}
+              <IconButton onClick={() => setOpenDrawer(true)}>
+                <MenuIcon sx={{ fontSize: 28 }} />
+              </IconButton>
+            </Stack>
           )}
         </Toolbar>
 
         {/* Mobile Drawer */}
-        <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
+        <Drawer
+          anchor="right"
+          open={openDrawer}
+          onClose={() => setOpenDrawer(false)}
+        >
           <Box sx={{ width: 260, p: 2 }}>
-            {/* Dark/Light Toggle */}
-            <Box sx={{ mb: 2 }}>
-              <Button fullWidth variant="outlined" startIcon={<Brightness4Icon />}>
-                Dark/Light
-              </Button>
-            </Box>
-
-            {/* Search */}
-            <Box sx={{ mb: 2 }}>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                placeholder="Search courses..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Box>
-
             <List>
+              {isLoggedIn && (
+                <ListItem>
+                  <Avatar
+                    sx={{
+                      bgcolor: theme.palette.primary.main,
+                      color: "#fff",
+                      width: 32,
+                      height: 32,
+                      mr: 1,
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    {user.fullName?.charAt(0).toUpperCase()}
+                  </Avatar>
+                  <ListItemText primary={user.fullName} />
+                </ListItem>
+              )}
+
               {drawerLinks.map((link) => (
-                <ListItem key={link.path} button component={Link} to={link.path} onClick={() => setOpenDrawer(false)}>
+                <ListItem
+                  key={link.path}
+                  component={Link}
+                  to={link.path}
+                  onClick={() => setOpenDrawer(false)}
+                  sx={{
+                    cursor: "pointer",
+                    color: isActive(link.path)
+                      ? theme.palette.primary.main
+                      : theme.palette.text.secondary,
+                    borderBottom: isActive(link.path)
+                      ? `3px solid ${theme.palette.primary.main}`
+                      : "3px solid transparent",
+                    "&:hover": {
+                      color: theme.palette.primary.main,
+                      borderBottom: `3px solid ${theme.palette.primary.main}`,
+                    },
+                  }}
+                >
                   <ListItemText primary={link.label} />
                 </ListItem>
               ))}
 
-              {/* Page Dropdown Mobile */}
               {pageLinks.map((link) => (
-                <ListItem key={link.path} button component={Link} to={link.path} onClick={() => setOpenDrawer(false)}>
-                  <ListItemText primary={link.label} sx={{ pl: 2 }} />
+                <ListItem
+                  key={link.path}
+                  component={Link}
+                  to={link.path}
+                  onClick={() => setOpenDrawer(false)}
+                  sx={{
+                    pl: 2,
+                    cursor: "pointer",
+                    color: isActive(link.path)
+                      ? theme.palette.primary.main
+                      : theme.palette.text.secondary,
+                    borderBottom: isActive(link.path)
+                      ? `3px solid ${theme.palette.primary.main}`
+                      : "3px solid transparent",
+                    "&:hover": {
+                      color: theme.palette.primary.main,
+                      borderBottom: `3px solid ${theme.palette.primary.main}`,
+                    },
+                  }}
+                >
+                  <ListItemText primary={link.label} />
                 </ListItem>
               ))}
 
               {!isLoggedIn ? (
-                <ListItem button component={Link} to="/auth" onClick={() => setOpenDrawer(false)}>
+                <ListItem
+                  component={Link}
+                  to="/auth"
+                  onClick={() => setOpenDrawer(false)}
+                  sx={{ cursor: "pointer" }}
+                >
                   <ListItemText primary="Login / Register" />
                 </ListItem>
               ) : (
                 <>
-                  <ListItem button component={Link} to="/profile" onClick={() => setOpenDrawer(false)}>
+                  <ListItem
+                    component={Link}
+                    to="/profile"
+                    onClick={() => setOpenDrawer(false)}
+                    sx={{ cursor: "pointer" }}
+                  >
                     <ListItemText primary="Profile" />
                   </ListItem>
                   <ListItem
-                    button
                     onClick={() => {
                       handleLogout();
                       setOpenDrawer(false);
                     }}
+                    sx={{ cursor: "pointer" }}
                   >
                     <ListItemText primary="Logout" />
                   </ListItem>

@@ -1,80 +1,63 @@
-import React from 'react';
-import { Box, Typography, Container } from '@mui/material';
+import React from "react";
+import { Box, Typography, Container } from "@mui/material";
+import CountUp from "react-countup";
 
-// Dữ liệu mẫu (thay thế bằng dữ liệu thực tế của bạn)
 const statsData = [
-  { value: '25K+', label: 'Active Students' },
-  { value: '899', label: 'Total Courses' },
-  { value: '158', label: 'Instructor' },
-  { value: '100%', label: 'Satisfaction Rate' },
+  { value: 25, suffix: "k+", label: "Active Students" },
+  { value: 899, suffix: "", label: "Total Courses" },
+  { value: 158, suffix: "", label: "Instructor" },
+  { value: 100, suffix: "%+", label: "Satisfaction Rate" }
 ];
 
 export default function StatsSection() {
   return (
-    <Box sx={{  py: { xs: 4, md: 6 }, backgroundColor: '#F8FAFC' }}>
+    <Box sx={{ backgroundColor: "#F8FAFC" }}>
       <Container maxWidth="lg">
-        {/* Box chứa các thẻ thống kê */}
         <Box
           sx={{
-            display: 'flex',
-            flexWrap: 'wrap', // Cho phép các item xuống dòng khi không đủ chỗ
-            justifyContent: 'center', // Căn giữa các item
-            gap: { xs: 2, md: 3 }, // Khoảng cách giữa các item, điều chỉnh tùy ý
-            // Nếu bạn muốn các item có khoảng cách đều giữa chúng và căn lề trái/phải,
-            // có thể dùng justifyContent: 'space-between' và điều chỉnh width con.
-            // Ví dụ: width: { xs: 'calc(50% - 8px)', sm: 'calc(33.33% - 8px)', md: 'calc(25% - 8px)' }
-            // nếu gap là 16px. Nhưng với '48%', '30%', '20%' thì 'center' hoặc 'space-around' là tốt.
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(auto-fit, minmax(220px, 1fr))", // cột rộng hơn, auto-fit
+            },
+            gap: { xs: 3, md: 4 },
+            textAlign: "center",
           }}
         >
           {statsData.map((stat, index) => (
             <Box
-  key={index}
-  sx={{
-    flex: {
-      xs: '0 1 calc(50% - 8px)',
-      sm: '0 1 calc(33.33% - 16px)',
-      md: '0 1 calc(25% - 16px)',
-    },
-    maxWidth: {
-      xs: 'calc(50% - 8px)',
-      sm: 'calc(33.33% - 16px)',
-      md: 'calc(20% - 16px)',
-    },
-                aspectRatio: '1.5 / 1', // Giữ tỷ lệ khung hình
-                borderRadius: 3,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                p: 2,
-                backgroundColor: '#fff',
-                border: '1px solid #e0e0e0',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.05)', // Box shadow nhẹ hơn để giống ảnh
-                transition: '0.25s ease',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.1)', // Box shadow nổi bật hơn khi hover
-                  backgroundColor: '#f5f5f5',
+              key={index}
+              sx={{
+                p: { xs: 4, md: 5 }, // rộng hơn
+                backgroundColor: "#e6e7e7ff",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                borderRadius: 4,
+                transition: "0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: "0 6px 16px rgba(0,0,0,0.1)",
                 },
               }}
             >
               <Typography
-                variant="h4" // Sử dụng h4 hoặc h3 cho số lớn
+                variant="h3"
                 sx={{
-                  fontWeight: 800,
-                  color: '#FF7F43', // Màu cam của bạn
-                  fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' }, // Kích thước chữ responsive
-                  mb: 0.5,
+                  fontWeight: 700,
+                  color: "#FF7F43",
+                  mb: 1,
+                  fontSize: { xs: "2rem", md: "2.5rem" },
+                  lineHeight: 1.2,
                 }}
               >
-                {stat.value}
+                <CountUp end={stat.value} duration={2} separator="," />
+                {stat.suffix}
               </Typography>
               <Typography
-                variant="body1" // Sử dụng body1 hoặc body2 cho text mô tả
+                variant="subtitle1"
                 sx={{
-                  color: '#666',
-                  fontSize: { xs: '0.85rem', sm: '0.9rem', md: '1rem' }, // Kích thước chữ responsive
-                  textAlign: 'center',
+                  fontWeight: 500,
+                  color: "#333",
+                  fontSize: { xs: "0.95rem", md: "1rem" },
                 }}
               >
                 {stat.label}

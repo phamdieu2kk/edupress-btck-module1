@@ -7,7 +7,6 @@ import {
   Typography,
   Stack,
   Box,
-  Button,
   Tooltip,
 } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -15,33 +14,34 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Link } from "react-router-dom";
 
 const BlogCard = ({ post, view = "grid" }) => {
-  const { title, excerpt, image, author, date, id } = post;
+  const { title, excerpt, image, author, createdAt, _id } = post;
   const isList = view === "list";
 
   return (
-   <Card
-  component={Link}
-  to={`/blog/${id}`} // <--- chuyển hướng đến BlogDetail qua ID
-  sx={{
-    textDecoration: "none", // không có gạch chân
-    color: "inherit",
-    display: "flex",
-    flexDirection: isList ? { xs: "column", sm: "row" } : "column",
-    borderRadius: 2,
-    boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
-    overflow: "hidden",
-    width: "100%",
-    minHeight: isList ? { xs: 300, sm: 220 } : 360,
-    height: "100%",
-  }}
->
+    <Card
+      component={Link}
+      to={`/blog/${_id}`}
+      sx={{
+        textDecoration: "none",
+        color: "inherit",
+        display: "flex",
+        flexDirection: isList ? { xs: "column", sm: "row" } : "column",
+        // Đã chỉnh sửa: Đặt bo góc cho Card
+        borderRadius: 2, 
+        boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
+        overflow: "hidden",
+        width: "100%",
+        minHeight: isList ? { xs: 300, sm: 220 } : 360, 
+        height: "100%",
+      }}
+    >
       <CardMedia
         component="img"
         image={image}
         alt={title}
         sx={{
-          width: isList ? { xs: "100%", sm: 280 } : "100%",
-          height: isList ? { xs: 180, sm: "100%" } : 200,
+          width: isList ? { xs: "100%", sm: 300 } : "100%", 
+          height: isList ? { xs: 180, sm: 220 } : 200, 
           objectFit: "cover",
           flexShrink: 0,
         }}
@@ -51,7 +51,7 @@ const BlogCard = ({ post, view = "grid" }) => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
+          justifyContent: "center", 
           p: 2,
           flex: 1,
         }}
@@ -89,19 +89,23 @@ const BlogCard = ({ post, view = "grid" }) => {
           </Typography>
 
           <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-           
-
+            {isList && author && (
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <PersonIcon fontSize="small" sx={{ color: "primary.main" }} />
+                <Typography variant="caption" color="text.secondary">
+                  {author}
+                </Typography>
+              </Stack>
+            )}
+            
             <Stack direction="row" spacing={0.5} alignItems="center">
               <CalendarTodayIcon fontSize="small" sx={{ color: "primary.main" }} />
               <Typography variant="caption" color="text.secondary">
-                {date}
+                {new Date(createdAt).toLocaleDateString()}
               </Typography>
             </Stack>
           </Stack>
         </Box>
-
-        
-        
       </CardContent>
     </Card>
   );

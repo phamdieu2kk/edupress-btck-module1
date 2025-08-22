@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Paper,
   TextField,
@@ -11,6 +11,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -25,6 +26,7 @@ const inputSx = {
 };
 
 const Register = () => {
+  const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -62,8 +64,11 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
       });
-      alert(res.data.message || "Registration successful!");
-      navigate("/auth/login");
+
+      // Sau khi đăng ký thành công, tự động login
+      login(res.data.user, res.data.token);
+
+      navigate("/");
     } catch (error) {
       alert(error.response?.data?.message || "Registration failed.");
     } finally {
