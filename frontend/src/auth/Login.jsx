@@ -10,6 +10,8 @@ import {
   CircularProgress,
   Paper,
   Typography,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
@@ -30,14 +32,15 @@ const inputSx = {
 
 const Login = () => {
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const navigate = useNavigate();
+  const [successSnackbar, setSuccessSnackbar] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -55,7 +58,13 @@ const Login = () => {
       if (rememberMe) localStorage.setItem("rememberedUser", email);
       else localStorage.removeItem("rememberedUser");
 
-      navigate("/");
+      // Hiện thông báo thành công
+      setSuccessSnackbar(true);
+
+      // Redirect sau 1.5s
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
     } catch (error) {
       setErrorMessage(error.response?.data?.message || "Login failed.");
     } finally {
@@ -64,87 +73,101 @@ const Login = () => {
   };
 
   return (
-    <Paper
-      elevation={5}
-      sx={{
-        flex: 1,
-        p: { xs: 3, md: 4 },
-        borderRadius: 3,
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "white",
-      }}
-    >
-      <Typography variant="h4" mb={2} sx={{ fontWeight: "bold" }}>
-        Login
-      </Typography>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleLogin();
+    <>
+      <Paper
+        elevation={5}
+        sx={{
+          flex: 1,
+          p: { xs: 3, md: 4 },
+          borderRadius: 3,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "white",
         }}
-        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
       >
-        <TextField
-          fullWidth
-          label="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={!!errorMessage}
-          helperText={errorMessage}
-          sx={inputSx}
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={!!errorMessage}
-          helperText={errorMessage}
-          sx={inputSx}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
+        <Typography variant="h4" mb={2} sx={{ fontWeight: "bold" }}>
+          Login
+        </Typography>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
           }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              color="primary"
-              size="small"
-            />
-          }
-          label="Remember me"
-        />
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          sx={{
-            mt: 2,
-            py: 1.1,
-            fontWeight: "bold",
-            textTransform: "none",
-            borderRadius: 8,
-            backgroundColor: "#f36602ff",
-            color: "black",
-            "&:hover": { backgroundColor: "#f26e0fff" },
-          }}
-          disabled={loading}
+          style={{ display: "flex", flexDirection: "column", gap: "16px" }}
         >
-          {loading ? <CircularProgress size={22} color="inherit" /> : "Login"}
-        </Button>
-      </form>
-    </Paper>
+          <TextField
+            fullWidth
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={!!errorMessage}
+            helperText={errorMessage}
+            sx={inputSx}
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={!!errorMessage}
+            helperText={errorMessage}
+            sx={inputSx}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                color="primary"
+                size="small"
+              />
+            }
+            label="Remember me"
+          />
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            sx={{
+              mt: 2,
+              py: 1.1,
+              fontWeight: "bold",
+              textTransform: "none",
+              borderRadius: 8,
+              backgroundColor: "#f36602ff",
+              color: "black",
+              "&:hover": { backgroundColor: "#f26e0fff" },
+            }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={22} color="inherit" /> : "Login"}
+          </Button>
+        </form>
+      </Paper>
+
+      {/* Snackbar thông báo */}
+      <Snackbar
+        open={successSnackbar}
+        autoHideDuration={1500}
+        onClose={() => setSuccessSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
+          🎉 Đăng nhập thành công!
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 

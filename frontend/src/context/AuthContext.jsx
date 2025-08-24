@@ -3,25 +3,39 @@ import React, { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
-  );
+  const safeParse = (key) => {
+    try {
+      const item = localStorage.getItem(key);
+      if (!item || item === "undefined" || item === "null") return null;
+      return JSON.parse(item);
+    } catch (error) {
+      console.error(`Error parsing localStorage key "${key}":`, error);
+      return null;
+    }
+  };
+
+  const [user, setUser] = useState(safeParse("user"));
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
     }
-  }, []);
+  }, [user]);
 
-  const login = (userData, authToken) => {
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  }, [token]);
+
+  const login = (userData, tokenValue) => {
     setUser(userData);
-    setToken(authToken);
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", authToken);
+    setToken(tokenValue);
   };
 
   const logout = () => {
@@ -31,8 +45,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
+  const register = (userData, tokenValue, navigate) => {
+    setUser(userData);
+    setToken(tokenValue);
+    // ✅ Sau khi đăng ký thành công → chuyển về login
+    if (navigate) navigate("/login");
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

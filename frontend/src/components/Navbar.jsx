@@ -10,6 +10,8 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemButton,
+  Collapse,
   Stack,
   Menu,
   MenuItem,
@@ -23,6 +25,8 @@ import {
   Menu as MenuIcon,
   ArrowDropDown as ArrowDropDownIcon,
   Search as SearchIcon,
+  ExpandLess,
+  ExpandMore,
 } from "@mui/icons-material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -33,18 +37,18 @@ export default function Navbar() {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // ✅ Định nghĩa 5 mức breakpoint
-  const isTabletUp = useMediaQuery(theme.breakpoints.up("sm")); // >=576
-  const isLaptopUp = useMediaQuery(theme.breakpoints.up("md")); // >=768
-  const isLargePcUp = useMediaQuery(theme.breakpoints.up("lg")); // >=992
-  const isXlUp = useMediaQuery(theme.breakpoints.up("xl")); // >=1200
-  const isXxlUp = useMediaQuery(theme.breakpoints.up("xxl")); // >=1400 (custom trong theme)
+  // Breakpoints
+  const isTabletUp = useMediaQuery(theme.breakpoints.up("sm"));
+  const isLaptopUp = useMediaQuery(theme.breakpoints.up("md"));
+  const isLargePcUp = useMediaQuery(theme.breakpoints.up("lg"));
+  const isXxlUp = useMediaQuery(theme.breakpoints.up("xxl"));
 
   const [openDrawer, setOpenDrawer] = useState(false);
   const [anchorElPage, setAnchorElPage] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [openPageDrawer, setOpenPageDrawer] = useState(false);
 
   const { user, logout } = useContext(AuthContext);
   const isLoggedIn = !!user;
@@ -72,7 +76,6 @@ export default function Navbar() {
     { label: "Premium Theme", path: "/premium-themes" },
   ];
 
-  // Style link
   const navLinkStyle = (active) => ({
     position: "relative",
     color: active ? theme.palette.primary.main : theme.palette.text.primary,
@@ -108,10 +111,7 @@ export default function Navbar() {
         position="sticky"
         color="inherit"
         elevation={0}
-        sx={{
-          borderBottom: "1px solid #eee",
-          backgroundColor: "#fff",
-        }}
+        sx={{ borderBottom: "1px solid #eee", backgroundColor: "#fff" }}
       >
         <Toolbar
           sx={{
@@ -132,14 +132,20 @@ export default function Navbar() {
                 src={logo}
                 alt="EduPress Logo"
                 style={{
-                  width: isLargePcUp ? 170 : isLaptopUp ? 150 : isTabletUp ? 120 : 100,
+                  width: isLargePcUp
+                    ? 170
+                    : isLaptopUp
+                    ? 150
+                    : isTabletUp
+                    ? 120
+                    : 100,
                   cursor: "pointer",
                 }}
               />
             </Link>
           </Box>
 
-          {/* Full Menu: từ laptop (>=768) trở lên */}
+          {/* Full Menu Laptop+ */}
           {isLaptopUp && (
             <Box
               sx={{
@@ -203,7 +209,6 @@ export default function Navbar() {
           {/* Desktop Auth + Search */}
           {isLaptopUp && (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              {/* Search */}
               <IconButton
                 onClick={() => setSearchOpen((prev) => !prev)}
                 sx={{
@@ -244,9 +249,7 @@ export default function Navbar() {
                     px: 3,
                     py: 1,
                     fontFamily: "Inter, sans-serif",
-                    "&:hover": {
-                      backgroundColor: theme.palette.primary.dark,
-                    },
+                    "&:hover": { backgroundColor: theme.palette.primary.dark },
                   }}
                 >
                   Login / Register
@@ -283,14 +286,10 @@ export default function Navbar() {
             </Stack>
           )}
 
-          {/* Mobile + Tablet: chỉ logo + icon */}
+          {/* Mobile / Tablet */}
           {!isLaptopUp && (
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-              sx={{ pr: { xs: 1, sm: 2 } }} // Updated padding
-            >
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ pr: { xs: 1, sm: 5 } }}>
+              {/* Avatar luôn hiển thị nếu logged in */}
               {isLoggedIn && (
                 <IconButton onClick={handleOpen(setAnchorElUser)}>
                   <Avatar
@@ -306,19 +305,87 @@ export default function Navbar() {
                   </Avatar>
                 </IconButton>
               )}
+
+              {!isLoggedIn && (
+                <Button
+                  component={Link}
+                  to="/auth"
+                  sx={{
+                    backgroundColor: theme.palette.primary.main,
+                    color: "#fff",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    borderRadius: "30px",
+                    px: 2,
+                    py: 0.7,
+                    fontSize: "0.85rem",
+                    "&:hover": { backgroundColor: theme.palette.primary.dark },
+                  }}
+                >
+                  Login / Register
+                </Button>
+              )}
+
+              <IconButton
+                onClick={() => setSearchOpen((prev) => !prev)}
+                sx={{
+                  border: "1px solid #eee",
+                  bgcolor: "#fafafa",
+                  "&:hover": { bgcolor: "#f0f0f0" },
+                }}
+              >
+                <SearchIcon sx={{ color: theme.palette.text.secondary }} />
+              </IconButton>
+              {searchOpen && (
+                <InputBase
+                  placeholder="Search courses..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  sx={{
+                    border: "1px solid #ddd",
+                    borderRadius: "20px",
+                    px: 2,
+                    py: 0.7,
+                    ml: 1,
+                    width: 220,
+                    fontSize: "14px",
+                  }}
+                />
+              )}
+
+              {/* Drawer icon */}
               <IconButton onClick={() => setOpenDrawer(true)}>
                 <MenuIcon sx={{ fontSize: 28 }} />
               </IconButton>
+
+              {/* Mobile Avatar Dropdown Menu */}
+              {isLoggedIn && (
+                <Menu
+                  anchorEl={anchorElUser}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleClose(setAnchorElUser)}
+                >
+                  <MenuItem disabled>{user.fullName}</MenuItem>
+                  <Divider />
+                  <MenuItem component={Link} to="/profile" onClick={handleClose(setAnchorElUser)}>
+                    Profile
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      handleLogout();
+                      handleClose(setAnchorElUser)();
+                    }}
+                  >
+                    Logout
+                  </MenuItem>
+                </Menu>
+              )}
             </Stack>
           )}
         </Toolbar>
 
         {/* Mobile Drawer */}
-        <Drawer
-          anchor="right"
-          open={openDrawer}
-          onClose={() => setOpenDrawer(false)}
-        >
+        <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
           <Box sx={{ width: 260, p: 2 }}>
             <List>
               {isLoggedIn && (
@@ -339,6 +406,7 @@ export default function Navbar() {
                 </ListItem>
               )}
 
+              {/* Drawer main links */}
               {drawerLinks.map((link) => (
                 <ListItem
                   key={link.path}
@@ -363,31 +431,43 @@ export default function Navbar() {
                 </ListItem>
               ))}
 
-              {pageLinks.map((link) => (
-                <ListItem
-                  key={link.path}
-                  component={Link}
-                  to={link.path}
-                  onClick={() => setOpenDrawer(false)}
-                  sx={{
-                    pl: 2,
-                    cursor: "pointer",
-                    color: isActive(link.path)
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                    borderBottom: isActive(link.path)
-                      ? `3px solid ${theme.palette.primary.main}`
-                      : "3px solid transparent",
-                    "&:hover": {
-                      color: theme.palette.primary.main,
-                      borderBottom: `3px solid ${theme.palette.primary.main}`,
-                    },
-                  }}
-                >
-                  <ListItemText primary={link.label} />
-                </ListItem>
-              ))}
+              {/* Page dropdown in drawer */}
+              <ListItemButton
+                onClick={() => setOpenPageDrawer((prev) => !prev)}
+                sx={{
+                  pl: 2,
+                  color: pageLinks.some((p) => isActive(p.path))
+                    ? theme.palette.primary.main
+                    : theme.palette.text.secondary,
+                }}
+              >
+                <ListItemText primary="Page" />
+                {openPageDrawer ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={openPageDrawer} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {pageLinks.map((link) => (
+                    <ListItem
+                      key={link.path}
+                      component={Link}
+                      to={link.path}
+                      onClick={() => setOpenDrawer(false)}
+                      sx={{
+                        pl: 4,
+                        cursor: "pointer",
+                        color: isActive(link.path)
+                          ? theme.palette.primary.main
+                          : theme.palette.text.secondary,
+                        "&:hover": { color: theme.palette.primary.main },
+                      }}
+                    >
+                      <ListItemText primary={link.label} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Collapse>
 
+              {/* Auth */}
               {!isLoggedIn ? (
                 <ListItem
                   component={Link}

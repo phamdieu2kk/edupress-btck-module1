@@ -11,9 +11,11 @@ import {
 } from "@mui/material";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const { user, setUser, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -63,6 +65,11 @@ export default function Profile() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -129,7 +136,7 @@ export default function Profile() {
               onChange={handleChange}
               fullWidth
             />
-           
+            
             <TextField
               label="Address"
               name="address"
@@ -162,7 +169,7 @@ export default function Profile() {
             boxShadow: 2,
             "&:hover": { backgroundColor: "#d32f2f" },
           }}
-          onClick={logout}
+          onClick={handleLogout}
         >
           Logout
         </Button>
