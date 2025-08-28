@@ -2,7 +2,7 @@ const Course = require('../models/Course');
 const Lesson = require('../models/Lesson');
 const Enrollment = require('../models/Enrollment');
 const Review = require('../models/Review');
-
+const slugify = require("slugify");
 // Public: danh sách khoá học APPROVED (+search ?q=)
 // exports.listCourses = async (req, res) => {
 //   const q = { status: 'APPROVED' };
@@ -18,42 +18,48 @@ const Review = require('../models/Review');
 exports.listCourses = async (req, res) => {
   try {
     const q = { status: "APPROVED" };
-
-    // Search by title
-    if (req.query.q) {
-      q.title = { $regex: req.query.q, $options: "i" };
-    }
-
-    // Filter by category (support multiple categories)
-    if (req.query.category) {
-      const categories = req.query.category.split(",").map((c) => c.trim());
-      q.category = { $in: categories }; // match bất kỳ category nào trong mảng
-    }
+    if (req.query.q) q.title = { $regex: req.query.q, $options: "i" };
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
     const skip = (page - 1) * limit;
 
+    // Dùng aggregation để trả lessonCount mà không cần populate toàn bộ lesson
+    const courses = await Course.aggregate([
+      { $match: q },
+      {
+        $lookup: {
+          from: "lessons",
+          localField: "_id",
+          foreignField: "courseId",
+          as: "lessons",
+        },
+      },
+      {
+        $addFields: { lessonCount: { $size: "$lessons" } },
+      },
+      { $project: { lessons: 0 } }, // bỏ mảng lessons để nhẹ
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
     const totalCourses = await Course.countDocuments(q);
-
-    const courses = await Course.find(q)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate("provider", "name");
-
-    const totalPages = Math.ceil(totalCourses / limit);
 
     res.json({
       courses,
-      pagination: { totalPages },
+      pagination: {
+        total: totalCourses,
+        totalPages: Math.ceil(totalCourses / limit),
+        page,
+        limit,
+      },
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 
 
@@ -107,4 +113,69 @@ exports.reviewCourse = async (req, res) => {
 
   const review = await Review.create({ user: req.user.id, course: id, rating, comment });
   res.status(201).json(review);
+};
+
+
+
+
+
+
+
+// POST /api/courses
+exports.createCourse = async (req, res) => {
+  try {
+    if (!req.body.slug && req.body.title) {
+      req.body.slug = slugify(req.body.title, { lower: true, strict: true });
+    }
+    const newCourse = await Course.create(req.body);
+    res.status(201).json(newCourse);
+  } catch (err) {
+    console.error("❌ Error creating course:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Update a course by ID (PUT /api/courses/:id)
+exports.updateCourse = async (req, res) => {
+  try {
+    const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedCourse) return res.status(404).json({ message: "Course not found" });
+    res.json(updatedCourse);
+  } catch (err) {
+    console.error("❌ Error updating course:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete a course by ID (DELETE /api/courses/:id)
+exports.deleteCourse = async (req, res) => {
+  try {
+    const deletedCourse = await Course.findByIdAndDelete(req.params.id);
+    if (!deletedCourse) return res.status(404).json({ message: "Course not found" });
+    res.json({ message: "Course deleted successfully" });
+  } catch (err) {
+    console.error("❌ Error deleting course:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
+
+// GET /api/courses/with-lessons
+exports.getCoursesWithLessons = async (req, res) => {
+  try {
+    const courses = await Course.find()
+      .populate({
+        path: "lessons",
+        options: { sort: { order: 1 } },
+      })
+      .sort({ createdAt: -1 });
+
+    res.json(courses);
+  } catch (err) {
+    console.error("❌ getCoursesWithLessons error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 };

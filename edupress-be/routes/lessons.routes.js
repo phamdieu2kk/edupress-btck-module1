@@ -1,12 +1,12 @@
-const mongoose = require("mongoose");
+const express = require("express");
+const lessonController = require("../controllers/lessons.controller");
+const router = express.Router();
 
-const lessonSchema = new mongoose.Schema({
-  id: Number,
-  courseId: Number,
-  title: String,
-  duration: String,
-  order: Number,
-  section: String
-});
+router.get("/", lessonController.getAllLessons);
+router.get("/course/:courseId", lessonController.getLessonsByCourse);
+router.get("/:id", lessonController.getLessonById);
+router.post("/", lessonController.createLesson);
+router.put("/:id", lessonController.updateLesson);
+router.delete("/:id", lessonController.deleteLesson);
 
-module.exports = mongoose.model("Lesson", lessonSchema);
+module.exports = router;

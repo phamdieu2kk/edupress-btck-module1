@@ -8,7 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
 
 import CourseDetail from "./pages/courses/CourseDetail";
-import LessonManagement from "./pages/lessons/LessonManagement";
+// import LessonManagement from "./pages/lessons/LessonManagement";
+import Lessons from "./pages/Lessons";
 import LessonCreateEdit from "./pages/lessons/LessonCreateEdit";
 import RevenueReport from "./pages/reports/RevenueReport";
 import RevenueDetail from "./pages/reports/RevenueDetail";
@@ -35,11 +36,18 @@ function App() {
 
 
         {/* Lessons */}
-        <Route path="lessons" element={<LessonManagement />} />
-        <Route path="lessons/create" element={<LessonCreateEdit />} />
-        <Route path="lessons/:id/edit" element={<LessonCreateEdit />} />
+        <Route path="lessons" element={<Lessons />} />
+  
+{/* <Route path="/admin/lessons/create/:courseId" element={<LessonCreateEdit />} />
+<Route path="/admin/lessons/edit/:lessonId/:courseId" element={<LessonCreateEdit />} /> */}
+ {/* Danh sách lesson theo course */}
+        <Route path="/admin/lessons/:courseId" element={<Lessons />} />
 
-        {/* Reports */}
+        {/* Tạo mới lesson trong course */}
+        <Route path="/admin/lessons/create/:courseId" element={<LessonCreateEdit />} />
+
+        {/* Chỉnh sửa lesson */}
+        <Route path="/admin/lessons/edit/:id/:courseId" element={<LessonCreateEdit />} />
         <Route path="reports" element={<RevenueReport />} />
         <Route path="reports/:id" element={<RevenueDetail />} />
 

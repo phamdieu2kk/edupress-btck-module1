@@ -29,7 +29,7 @@ const drawerWidth = 200;
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
   { text: "Courses", icon: <ClassIcon />, path: "/admin/courses" },
-  { text: "Lessons", icon: <MenuBookIcon />, path: "/admin/lessons" },
+  // { text: "Lessons", icon: <MenuBookIcon />, path: "/admin/lessons" },
   { text: "Reports", icon: <BarChartIcon />, path: "/admin/reports" },
   { text: "Reviews", icon: <ReviewsIcon />, path: "/admin/reviews" },
 ];

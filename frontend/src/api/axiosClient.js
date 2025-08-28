@@ -1,19 +1,22 @@
 // src/api/axiosClient.js
 import axios from "axios";
 
+// Vite dùng import.meta.env
+const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
- // khớp với edupress-be
+  baseURL,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // nếu BE dùng cookie
+  withCredentials: true, // nếu backend dùng cookie
 });
 
+// Interceptor: trả về data trực tiếp
 axiosClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    console.error(error);
+    console.error("API error:", error);
     throw error;
   }
 );

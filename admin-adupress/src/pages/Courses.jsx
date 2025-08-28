@@ -1,4 +1,3 @@
-// src/components/Courses.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -23,10 +22,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import CourseDetail from "./courses/CourseDetail";
+import { useNavigate } from "react-router-dom";  // ✅ Thêm dòng này
 
 const Courses = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const navigate = useNavigate();   // ✅ Thêm dòng này
 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -34,10 +35,11 @@ const Courses = () => {
   const [pageSize, setPageSize] = useState(5);
   const [total, setTotal] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
 
-  // Style mặc định cho tất cả các TableCell
   const commonCellSx = {
-    fontWeight: 700,
+    fontWeight: 600,
+    fontSize: "0.875rem",
   };
 
   const fetchCourses = async (page = 0, limit = 5) => {
@@ -70,6 +72,11 @@ const Courses = () => {
     }
   };
 
+  const handleEdit = (course) => {
+    setEditingCourse(course);
+    setOpenDialog(true);
+  };
+
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setPageSize(parseInt(event.target.value, 10));
@@ -77,13 +84,7 @@ const Courses = () => {
   };
 
   return (
-    <Box
-      sx={{
-        p: isMobile ? 1 : 3,
-        
-      }}
-    >
-      {/* Header */}
+    <Box sx={{ p: isMobile ? 1 : 3 }}>
       <Box
         sx={{
           display: "flex",
@@ -94,26 +95,28 @@ const Courses = () => {
           gap: 1,
         }}
       >
-       <Typography
-  variant={isMobile ? "h6" : "h5"}
-  sx={{ fontWeight: "bold", color: "#FB8C00" }}
->
-  Course Management
-</Typography>
-<Button
-  variant="contained"
-  sx={{
-    backgroundColor: "#FB8C00",
-    "&:hover": { backgroundColor: "#FF9800" },
-  }}
-  onClick={() => setOpenDialog(true)}
->
-  Create New Course
-</Button>
-</Box>
+        <Typography
+          variant={isMobile ? "body1" : "h6"}
+          sx={{ fontWeight: "bold", color: "#FB8C00" }}
+        >
+          Course Management
+        </Typography>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#FB8C00",
+            "&:hover": { backgroundColor: "#FF9800" },
+            fontSize: "0.8rem",
+          }}
+          onClick={() => {
+            setEditingCourse(null);
+            setOpenDialog(true);
+          }}
+        >
+          Create New Course
+        </Button>
+      </Box>
 
-
-      {/* Table */}
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress sx={{ color: "#FB8C00" }} />
@@ -123,37 +126,36 @@ const Courses = () => {
           <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
             <Table sx={{ minWidth: 650 }}>
               <TableHead sx={{ bgcolor: "#FFF3E0" }}>
-               <TableRow>
-  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
-    No.
-  </TableCell>
-  <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>
-    Course Name
-  </TableCell>
-  {!isMobile && (
-    <>
-      <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>
-        Author
-      </TableCell>
-      <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
-        Price
-      </TableCell>
-      <TableCell
-        sx={{
-          ...commonCellSx,
-          color: "#FB8C00",
-          maxWidth: "250px",
-        }}
-      >
-        Description
-      </TableCell>
-    </>
-  )}
-  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
-    Actions
-  </TableCell>
-</TableRow>
-
+                <TableRow>
+                  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
+                    No.
+                  </TableCell>
+                  <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>
+                    Course Name
+                  </TableCell>
+                  {!isMobile && (
+                    <>
+                      <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>
+                        Author
+                      </TableCell>
+                      <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
+                        Price
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          ...commonCellSx,
+                          color: "#FB8C00",
+                          maxWidth: "250px",
+                        }}
+                      >
+                        Description
+                      </TableCell>
+                    </>
+                  )}
+                  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
+                    Actions
+                  </TableCell>
+                </TableRow>
               </TableHead>
 
               <TableBody>
@@ -169,29 +171,66 @@ const Courses = () => {
                         {page * pageSize + index + 1}
                       </TableCell>
 
-                      <TableCell sx={commonCellSx}>{course.title}</TableCell>
+                      {/* ✅ Chỉ Course Name có điều hướng */}
+                      <TableCell
+                        sx={{
+                          ...commonCellSx,
+                          color: "#1976d2",
+                          cursor: "pointer",
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                        onClick={() =>
+                          navigate(`/admin/lessons/${course._id}`, {
+                            state: { courseName: course.title }, // ✅ gửi tên khóa học
+                          })
+                        }
+                      >
+                        {course.title}
+                      </TableCell>
 
                       {!isMobile && (
                         <>
                           <TableCell sx={commonCellSx}>{course.instructor}</TableCell>
-
                           <TableCell align="center" sx={commonCellSx}>
-                            {course.originalPrice && course.originalPrice > course.price ? (
+                            {/* giữ nguyên code giá */}
+                            {course.price === 0 && course.originalPrice > 0 ? (
                               <Box display="flex" flexDirection="column" alignItems="center">
                                 <Typography
                                   sx={{
-                                    fontSize: "0.95rem",
+                                    fontSize: "0.8rem",
                                     textDecoration: "line-through",
                                     color: "text.secondary",
-                                    fontWeight: 700,
+                                    fontWeight: 600,
                                   }}
                                 >
                                   ${course.originalPrice.toLocaleString()}
                                 </Typography>
                                 <Typography
                                   sx={{
-                                    fontSize: "0.95rem",
-                                    fontWeight: 700,
+                                    fontSize: "0.8rem",
+                                    fontWeight: 600,
+                                    color: "success.main",
+                                  }}
+                                >
+                                  Free
+                                </Typography>
+                              </Box>
+                            ) : course.price > 0 && course.price < course.originalPrice ? (
+                              <Box display="flex" flexDirection="column" alignItems="center">
+                                <Typography
+                                  sx={{
+                                    fontSize: "0.8rem",
+                                    textDecoration: "line-through",
+                                    color: "text.secondary",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  ${course.originalPrice.toLocaleString()}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: "0.8rem",
+                                    fontWeight: 600,
                                     color: "error.main",
                                   }}
                                 >
@@ -201,8 +240,8 @@ const Courses = () => {
                             ) : course.price === 0 ? (
                               <Typography
                                 sx={{
-                                  fontSize: "0.95rem",
-                                  fontWeight: 700,
+                                  fontSize: "0.8rem",
+                                  fontWeight: 600,
                                   color: "success.main",
                                 }}
                               >
@@ -211,8 +250,8 @@ const Courses = () => {
                             ) : (
                               <Typography
                                 sx={{
-                                  fontSize: "0.95rem",
-                                  fontWeight: 700,
+                                  fontSize: "0.8rem",
+                                  fontWeight: 600,
                                   color: "text.primary",
                                 }}
                               >
@@ -220,12 +259,12 @@ const Courses = () => {
                               </Typography>
                             )}
                           </TableCell>
-
                           <TableCell
                             sx={{
                               maxWidth: "250px",
                               whiteSpace: "normal",
-                              fontStyle: "italic", // 👈 override in nghiêng
+                              fontStyle: "italic",
+                              fontSize: "0.8rem",
                             }}
                           >
                             {course.description}
@@ -235,15 +274,19 @@ const Courses = () => {
 
                       <TableCell align="center">
                         <Stack direction="row" spacing={1} justifyContent="center">
-                          <IconButton size="small" color="primary">
-                            <EditIcon />
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => handleEdit(course)}
+                          >
+                            <EditIcon sx={{ fontSize: "1rem" }} />
                           </IconButton>
                           <IconButton
                             size="small"
                             color="error"
                             onClick={() => handleDelete(course._id)}
                           >
-                            <DeleteIcon />
+                            <DeleteIcon sx={{ fontSize: "1rem" }} />
                           </IconButton>
                         </Stack>
                       </TableCell>
@@ -251,7 +294,7 @@ const Courses = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={isMobile ? 3 : 6} align="center">
+                    <TableCell colSpan={isMobile ? 3 : 6} align="center" sx={{ fontSize: "0.8rem" }}>
                       Không có khóa học nào
                     </TableCell>
                   </TableRow>
@@ -259,7 +302,6 @@ const Courses = () => {
               </TableBody>
             </Table>
           </TableContainer>
-
           <TablePagination
             component="div"
             count={total}
@@ -268,15 +310,18 @@ const Courses = () => {
             rowsPerPage={pageSize}
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[5, 10, 20, 50]}
+            labelRowsPerPage="Số hàng mỗi trang:"
           />
         </>
       )}
-
-      {/* Drawer tạo khóa học */}
       <CourseDetail
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        onSaved={() => fetchCourses(page, pageSize)} // refresh bảng sau khi lưu
+        onClose={() => {
+          setOpenDialog(false);
+          setEditingCourse(null);
+        }}
+        onSaved={() => fetchCourses(page, pageSize)}
+        course={editingCourse}
       />
     </Box>
   );
