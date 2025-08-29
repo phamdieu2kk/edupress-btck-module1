@@ -1,3 +1,4 @@
+// src/components/courses/CourseCard.jsx
 import React from "react";
 import {
   Card,
@@ -7,10 +8,9 @@ import {
   Typography,
   Stack,
   Box,
-  Rating,
   Chip,
   Button,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
@@ -101,13 +101,26 @@ const CourseCard = ({ course, variant = "grid" }) => {
         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         borderRadius: 2,
         overflow: "hidden",
-        "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.1)", transform: "translateY(-2px)", transition: "0.2s" },
+        "&:hover": {
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          transform: "translateY(-2px)",
+          transition: "0.2s",
+        },
       }}
     >
-      <Box sx={{ position: "relative", width: isList ? { xs: "100%", sm: 320 } : "100%", flexShrink: 0 }}>
+      <Box
+        sx={{
+          position: "relative",
+          width: isList ? { xs: "100%", sm: 320 } : "100%",
+          flexShrink: 0,
+        }}
+      >
         <CardMedia
           component="img"
-          image={course.image || "https://via.placeholder.com/300x180"}
+          image={
+            course.image ||
+            "https://edupress.thimpress.com/wp-content/uploads/2024/01/create-an-lms-website-with-learnpress-5-1-800x488.jpg"
+          }
           alt={course.title}
           sx={{
             height: isList ? 200 : 200,
@@ -116,99 +129,140 @@ const CourseCard = ({ course, variant = "grid" }) => {
             borderRight: isList ? { xs: "none", sm: "1px solid #eee" } : "none",
           }}
         />
-        <Box sx={{ position: "absolute", top: 8, left: 8 }}>
-          <Chip
-            label="Photography"
-            size="small"
-            sx={{
-              backgroundColor: "black",
-              color: "white",
-              fontWeight: "bold"
-            }}
-          />
-        </Box>
+        {course.category && (
+          <Box sx={{ position: "absolute", top: 8, left: 8 }}>
+            <Chip
+              label={course.category}
+              size="small"
+              sx={{
+                backgroundColor: "black",
+                color: "white",
+                fontWeight: "bold",
+              }}
+            />
+          </Box>
+        )}
       </Box>
 
-      <CardContent sx={{ display: "flex", flexDirection: "column", flexGrow: 1, justifyContent: "space-between", p: 2 }}>
+      <CardContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          justifyContent: "space-between",
+          p: 2,
+        }}
+      >
         <Box>
-          <Typography variant="body2" color="text.secondary" mb={0.5}>By {course.instructor || "Unknown"}</Typography>
+          <Typography variant="body2" color="text.secondary" mb={0.5}>
+            By {course.instructor || "Unknown"}
+          </Typography>
           <Tooltip title={course.title}>
-            <Typography variant="h6" sx={{
-              fontWeight: 600,
-              lineHeight: 1.4,
-              display: "-webkit-box",
-              WebkitLineClamp: isList ? 2 : 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              mb: 1
-            }}>{course.title}</Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                lineHeight: 1.4,
+                display: "-webkit-box",
+                WebkitLineClamp: isList ? 2 : 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                mb: 1,
+              }}
+            >
+              {course.title}
+            </Typography>
           </Tooltip>
 
           {isList ? renderListInfoIcons() : renderGridInfoIcons()}
         </Box>
 
-        {/* --- PHẦN ĐÃ CHỈNH SỬA --- */}
         <Box mt={2}>
           <Divider sx={{ mb: 1 }} />
-          <Box sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 1
-          }}>
-            {/* Box chứa Giá và Rating */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            {/* Giá */}
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 flexGrow: 1,
-                // Điều chỉnh lại khoảng cách và căn lề cho màn hình điện thoại
                 justifyContent: { xs: "space-between", sm: "flex-start" },
-                width: { xs: "100%", sm: "auto" }
+                width: { xs: "100%", sm: "auto" },
               }}
             >
               <Stack direction="row" spacing={1} alignItems="baseline">
                 {course.originalPrice && course.originalPrice > course.price ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      sx={{ textDecoration: "line-through", color: "text.secondary", mr: 1 }}
-                    >
-                      ${course.originalPrice.toLocaleString()}
-                    </Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: "error.main" }}>
-                      ${course.price.toLocaleString()}
-                    </Typography>
-                  </>
-                ) : (
                   course.price === 0 ? (
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: "success.light" }}>Free</Typography>
-                  ) : (
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: "text.secondary" }}>
-                      ${course.price.toLocaleString()}
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, color: "success.light" }}
+                    >
+                      Free
                     </Typography>
+                  ) : (
+                    <>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          textDecoration: "line-through",
+                          color: "text.secondary",
+                          mr: 1,
+                        }}
+                      >
+                        ${course.originalPrice.toLocaleString()}
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: 700, color: "error.main" }}
+                      >
+                        ${course.price.toLocaleString()}
+                      </Typography>
+                    </>
                   )
+                ) : course.price === 0 ? (
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 700, color: "success.light" }}
+                  >
+                    Free
+                  </Typography>
+                ) : (
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 700, color: "text.secondary" }}
+                  >
+                    ${course.price.toLocaleString()}
+                  </Typography>
                 )}
               </Stack>
-              {/* Box hiển thị Rating */}
-              {/* <Box display="flex" alignItems="center">
-                <Rating name="read-only" value={course.rating || 0} readOnly precision={0.5} size="small" />
-                <Typography variant="body2" sx={{ ml: 0.5 }}>{course.rating?.toFixed(1) || "0.0"}</Typography>
-              </Box> */}
             </Box>
 
-            <Button component={Link} to={cardLink} size="small" variant="text" sx={{
-              textTransform: "none",
-              color: "black",
-              fontWeight: 600,
-              "&:hover": {
-                backgroundColor: "transparent",
-                textDecoration: "underline"
-              },
-              mt: { xs: 1, sm: 0 }
-            }}>
+            {/* View More Button */}
+            <Button
+              component={Link}
+              to={cardLink}
+              size="small"
+              variant="text"
+              sx={{
+                textTransform: "none",
+                color: "black",
+                fontWeight: 600,
+                "&:hover": {
+                  backgroundColor: "transparent",
+                  textDecoration: "underline",
+                },
+                mt: { xs: 1, sm: 0 },
+              }}
+            >
               View More
             </Button>
           </Box>

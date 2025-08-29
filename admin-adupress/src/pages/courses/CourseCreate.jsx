@@ -1,4 +1,3 @@
-// src/pages/courses/CourseCreate.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,13 +21,35 @@ const CourseCreate = () => {
   const [description, setDescription] = useState("");
   const [instructor, setInstructor] = useState("");
   const [price, setPrice] = useState(0);
+  const [imageFile, setImageFile] = useState(null); // File ảnh thực sự
+  const [preview, setPreview] = useState(""); // URL preview ảnh
   const [loading, setLoading] = useState(false);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file)); // Preview ảnh ngay
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/courses", { title, description, instructor, price });
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("instructor", instructor);
+      formData.append("price", price);
+      if (imageFile) {
+        formData.append("image", imageFile); // Gửi file ảnh
+      }
+
+      await axios.post("http://localhost:5000/api/courses", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       setLoading(false);
       navigate("/admin/courses");
     } catch (err) {
@@ -49,11 +70,18 @@ const CourseCreate = () => {
         margin: "20px auto",
       }}
     >
-      <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: "bold", color: "#FB8C00", mb: 3 }}>
+      <Typography
+        variant={isMobile ? "h6" : "h5"}
+        sx={{ fontWeight: "bold", color: "#FB8C00", mb: 3 }}
+      >
         Tạo / Chỉnh sửa khóa học
       </Typography>
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
         <TextField
           label="Tên khóa học"
           variant="outlined"
@@ -89,8 +117,43 @@ const CourseCreate = () => {
           onChange={(e) => setPrice(parseFloat(e.target.value))}
         />
 
-        <Stack direction="row" spacing={2} mt={2} justifyContent={isMobile ? "center" : "flex-start"}>
-          <Button type="submit" variant="contained" sx={{ backgroundColor: "#FB8C00", "&:hover": { backgroundColor: "#FF9800" } }} disabled={loading}>
+        {/* Upload ảnh */}
+        <Box>
+          <Button
+            variant="outlined"
+            component="label"
+            sx={{ mb: 1 }}
+          >
+            Chọn ảnh khóa học
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageChange}
+            />
+          </Button>
+          {preview && (
+            <Box
+              component="img"
+              src={preview}
+              alt="Preview"
+              sx={{ width: "100%", maxHeight: 200, objectFit: "cover", borderRadius: 1 }}
+            />
+          )}
+        </Box>
+
+        <Stack
+          direction="row"
+          spacing={2}
+          mt={2}
+          justifyContent={isMobile ? "center" : "flex-start"}
+        >
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ backgroundColor: "#FB8C00", "&:hover": { backgroundColor: "#FF9800" } }}
+            disabled={loading}
+          >
             {loading ? "Đang lưu..." : "Lưu"}
           </Button>
           <Button variant="outlined" onClick={() => navigate("/admin/courses")}>

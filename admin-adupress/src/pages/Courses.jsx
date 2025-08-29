@@ -1,3 +1,4 @@
+// src/pages/courses/Courses.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -22,12 +23,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import CourseDetail from "./courses/CourseDetail";
-import { useNavigate } from "react-router-dom";  // ✅ Thêm dòng này
+import { useNavigate } from "react-router-dom";
 
 const Courses = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const navigate = useNavigate();   // ✅ Thêm dòng này
+  const navigate = useNavigate();
 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -135,9 +136,7 @@ const Courses = () => {
                   </TableCell>
                   {!isMobile && (
                     <>
-                      <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>
-                        Author
-                      </TableCell>
+                      <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>Author</TableCell>
                       <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
                         Price
                       </TableCell>
@@ -163,36 +162,36 @@ const Courses = () => {
                   courses.map((course, index) => (
                     <TableRow
                       key={course._id}
-                      sx={{
-                        "&:hover": { backgroundColor: "rgba(251,140,0,0.05)" },
-                      }}
+                      sx={{ "&:hover": { backgroundColor: "rgba(251,140,0,0.05)" } }}
                     >
                       <TableCell align="center" sx={commonCellSx}>
                         {page * pageSize + index + 1}
                       </TableCell>
 
-                      {/* ✅ Chỉ Course Name có điều hướng */}
-                      <TableCell
-                        sx={{
-                          ...commonCellSx,
-                          color: "#1976d2",
-                          cursor: "pointer",
-                          "&:hover": { textDecoration: "underline" },
-                        }}
-                        onClick={() =>
-                          navigate(`/admin/lessons/${course._id}`, {
-                            state: { courseName: course.title }, // ✅ gửi tên khóa học
-                          })
-                        }
-                      >
-                        {course.title}
+                      {/* Course Name + thumbnail */}
+                      <TableCell sx={{ ...commonCellSx, cursor: "pointer" }} onClick={() =>
+                        navigate(`/admin/lessons/${course._id}`, { state: { courseName: course.title } })
+                      }>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <Box
+  component="img"
+  src={course.image || "https://edupress.thimpress.com/wp-content/uploads/2024/01/create-an-lms-website-with-learnpress-5-1-800x488.jpg"}
+  alt={course.title}
+  sx={{ width: 50, height: 50, objectFit: "cover", borderRadius: 1 }}
+/>
+
+                          <Typography
+                            sx={{ color: "#1976d2", "&:hover": { textDecoration: "underline" }, fontWeight: 600 }}
+                          >
+                            {course.title}
+                          </Typography>
+                        </Stack>
                       </TableCell>
 
                       {!isMobile && (
                         <>
                           <TableCell sx={commonCellSx}>{course.instructor}</TableCell>
                           <TableCell align="center" sx={commonCellSx}>
-                            {/* giữ nguyên code giá */}
                             {course.price === 0 && course.originalPrice > 0 ? (
                               <Box display="flex" flexDirection="column" alignItems="center">
                                 <Typography
@@ -206,11 +205,7 @@ const Courses = () => {
                                   ${course.originalPrice.toLocaleString()}
                                 </Typography>
                                 <Typography
-                                  sx={{
-                                    fontSize: "0.8rem",
-                                    fontWeight: 600,
-                                    color: "success.main",
-                                  }}
+                                  sx={{ fontSize: "0.8rem", fontWeight: 600, color: "success.main" }}
                                 >
                                   Free
                                 </Typography>
@@ -228,32 +223,20 @@ const Courses = () => {
                                   ${course.originalPrice.toLocaleString()}
                                 </Typography>
                                 <Typography
-                                  sx={{
-                                    fontSize: "0.8rem",
-                                    fontWeight: 600,
-                                    color: "error.main",
-                                  }}
+                                  sx={{ fontSize: "0.8rem", fontWeight: 600, color: "error.main" }}
                                 >
                                   ${course.price.toLocaleString()}
                                 </Typography>
                               </Box>
                             ) : course.price === 0 ? (
                               <Typography
-                                sx={{
-                                  fontSize: "0.8rem",
-                                  fontWeight: 600,
-                                  color: "success.main",
-                                }}
+                                sx={{ fontSize: "0.8rem", fontWeight: 600, color: "success.main" }}
                               >
                                 Free
                               </Typography>
                             ) : (
                               <Typography
-                                sx={{
-                                  fontSize: "0.8rem",
-                                  fontWeight: 600,
-                                  color: "text.primary",
-                                }}
+                                sx={{ fontSize: "0.8rem", fontWeight: 600, color: "text.primary" }}
                               >
                                 ${course.price?.toLocaleString()}
                               </Typography>
@@ -274,18 +257,10 @@ const Courses = () => {
 
                       <TableCell align="center">
                         <Stack direction="row" spacing={1} justifyContent="center">
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => handleEdit(course)}
-                          >
+                          <IconButton size="small" color="primary" onClick={() => handleEdit(course)}>
                             <EditIcon sx={{ fontSize: "1rem" }} />
                           </IconButton>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDelete(course._id)}
-                          >
+                          <IconButton size="small" color="error" onClick={() => handleDelete(course._id)}>
                             <DeleteIcon sx={{ fontSize: "1rem" }} />
                           </IconButton>
                         </Stack>
@@ -302,6 +277,7 @@ const Courses = () => {
               </TableBody>
             </Table>
           </TableContainer>
+
           <TablePagination
             component="div"
             count={total}
@@ -314,6 +290,7 @@ const Courses = () => {
           />
         </>
       )}
+
       <CourseDetail
         open={openDialog}
         onClose={() => {

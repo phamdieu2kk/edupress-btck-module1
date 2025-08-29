@@ -43,7 +43,7 @@ const LeaveComment = () => {
       boxShadow="0px 2px 10px rgba(0,0,0,0.05)"
     >
       <Typography variant="h6" gutterBottom>
-        {/* Leave A Comment */}
+        Leave A Comment
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
         Your email address will not be published. Required fields are marked *

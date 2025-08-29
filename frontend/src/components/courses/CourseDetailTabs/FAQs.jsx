@@ -1,14 +1,17 @@
+// src/pages/course/CourseDetailTabs/FAQs.jsx
+
 import React from "react";
 import {
   Box,
   Typography,
-  Container,
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Stack,
+  Divider,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import LeaveComment from "./LeaveComment";
+import LeaveComment from "./LeaveComment"; // Đảm bảo component này tồn tại
 
 const faqList = [
   {
@@ -40,22 +43,36 @@ const faqList = [
 
 const FAQs = () => {
   return (
-    <Box sx={{ bgcolor: "#F9FAFB", py: 8 }}>
-      <Container maxWidth="md">
-        <Typography variant="h4" fontWeight="bold" textAlign="center" mb={2}>
+    <Box>
+      {/* <Box
+                sx={{
+                  flex: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 3,
+                  backgroundColor: "#fff",
+                  p: 4,
+                 
+                }}
+              > */}
+                {/* <Typography variant="h4" fontWeight={600} gutterBottom>
           Frequently Asked Questions
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          color="text.secondary"
-          textAlign="center"
-          mb={5}
-        >
+        </Typography> */}
+        {/* <Typography variant="body2" color="text.secondary">
           Find answers to the most common questions about our platform and courses.
-        </Typography>
+        </Typography> */}
+      {/* </Box> */}
 
+      <Stack spacing={2}>
         {faqList.map((faq, index) => (
-          <Accordion key={index} sx={{ mb: 2, borderRadius: 2, boxShadow: 1 }}>
+          <Accordion
+            key={index}
+            sx={{
+              borderRadius: 2,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+              "&:before": { display: "none" },
+            }}
+          >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography fontWeight={600}>{faq.question}</Typography>
             </AccordionSummary>
@@ -64,10 +81,13 @@ const FAQs = () => {
             </AccordionDetails>
           </Accordion>
         ))}
-      </Container>
-      <LeaveComment/>
+      </Stack>
+
+      <Divider sx={{ mt: 4, mb: 4 }} />
+
+      <LeaveComment />
     </Box>
   );
 };
 
-export default FAQs;
+export default FAQs;  
