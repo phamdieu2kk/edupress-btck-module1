@@ -12,6 +12,7 @@ import ContactUs from "./pages/ContactUs";
 import Faqs from "./pages/Faqs";
 import Error from "./pages/Error";
 import Profile from "./pages/Profile";
+import ForgotPassword from "./auth/ForgotPassword";
 function App() {
   return (
     <BrowserRouter>
@@ -20,7 +21,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/register" element={<Register />} />
-        
+         <Route path="/forgot-password" element={<ForgotPassword />} />
+      
         {/* Courses */}
         <Route path="/courses" element={<CourseList />} /> {/* Hiển thị tất cả khóa học */}
         <Route path="/courses/:id" element={<CourseDetail />} /> {/* Chi tiết khóa học */}

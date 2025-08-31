@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Avatar,
-  Box,
-  Typography,
-  Stack,
-  IconButton,
-} from "@mui/material";
+import { Avatar, Box, Typography, Stack, IconButton } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -13,143 +7,80 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import PinterestIcon from "@mui/icons-material/Pinterest";
 import PeopleIcon from "@mui/icons-material/People";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-
 import instructorData from "@/data/instructorMock";
 import LeaveComment from "./LeaveComment";
 
-const socialColors = {
-  facebook: "#1877F2",
-  twitter: "#1DA1F2",
-  instagram: "#E1306C",
-  youtube: "#FF0000",
-  pinterest: "#BD081C",
-};
+const Instructor = ({ course }) => {
+  // Calculate the total number of lessons (including sub-lessons)
+  const totalLessons = course?.sections?.reduce((total, section) => {
+    const sectionLessons = section.subLessons ? section.subLessons.length : 0;
+    return total + sectionLessons;
+  }, 0) || 0;
 
-const Instructor = () => {
+  // Get the total number of students
+  const totalStudents = course?.students || 0;
+
   return (
-    <Box sx={{ bgcolor: "#f8f8f8" }}>
-      <Box
-        sx={{
-          maxWidth: 1200,
-          mx: "auto",
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 4,
-        }}
-      >
-        {/* Left: Instructor Info */}
-        <Box
-          sx={{
-            flex: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            backgroundColor: "#fff",
-            p: 4,
-            borderRadius: 3,
-            boxShadow: 1,
-          }}
+    <Box sx={{ p: 3, borderRadius: 2, boxShadow: 3, backgroundColor: "#fff" }}>
+      <Stack direction="row" spacing={4} alignItems="center">
+        <Avatar
+          src={instructorData.avatar}
+          alt={instructorData.name}
+          variant="square"
+          sx={{ width: 120, height: 120, bgcolor: "#f26c6d", borderRadius: 2 }}
         >
-          <Stack direction="row" spacing={4} alignItems="center">
-            <Avatar
-              src={instructorData.avatar}
-              alt={instructorData.name}
-              sx={{ width: 120, height: 120 }}
-            />
-            <Box flex={1}>
-              <Typography variant="h6" fontWeight="bold">
-                {instructorData.name}
-              </Typography>
-              <Typography variant="subtitle2" color="text.secondary" mb={1}>
-                {instructorData.title}
-              </Typography>
-              <Typography variant="body1" color="text.primary" mb={2}>
-                {instructorData.description}
-              </Typography>
+          <Typography variant="h4" sx={{ color: "#fff", fontWeight: 600, fontFamily: "serif" }}>
+            {/* ThimPress logo text */}
+            पा
+          </Typography>
+        </Avatar>
 
-              <Stack direction="row" spacing={3} alignItems="center" mb={2}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <PeopleIcon fontSize="small" color="action" />
-                  <Typography variant="body2" color="text.secondary">
-                    {instructorData.students} Students
-                  </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <MenuBookIcon fontSize="small" color="action" />
-                  <Typography variant="body2" color="text.secondary">
-                    {instructorData.lessons} Lessons
-                  </Typography>
-                </Stack>
-              </Stack>
+        <Box flex={1}>
+          <Typography variant="h6" fontWeight="bold">ThimPress</Typography>
+          <Typography variant="body2" color="text.secondary" mb={1}>
+            LearnPress is a comprehensive WordPress LMS Plugin for WordPress. This is one of the best WordPress LMS Plugins which can be used to easily create & sell courses online.
+          </Typography>
 
-              <Stack direction="row" spacing={2}>
-                {instructorData.social.facebook && (
-                  <IconButton
-                    href={instructorData.social.facebook}
-                    target="_blank"
-                    sx={{
-                      transition: "color 0.3s",
-                      "&:hover": { color: socialColors.facebook },
-                    }}
-                  >
-                    <FacebookIcon />
-                  </IconButton>
-                )}
-                {instructorData.social.twitter && (
-                  <IconButton
-                    href={instructorData.social.twitter}
-                    target="_blank"
-                    sx={{
-                      transition: "color 0.3s",
-                      "&:hover": { color: socialColors.twitter },
-                    }}
-                  >
-                    <TwitterIcon />
-                  </IconButton>
-                )}
-                {instructorData.social.instagram && (
-                  <IconButton
-                    href={instructorData.social.instagram}
-                    target="_blank"
-                    sx={{
-                      transition: "color 0.3s",
-                      "&:hover": { color: socialColors.instagram },
-                    }}
-                  >
-                    <InstagramIcon />
-                  </IconButton>
-                )}
-                {instructorData.social.pinterest && (
-                  <IconButton
-                    href={instructorData.social.pinterest}
-                    target="_blank"
-                    sx={{
-                      transition: "color 0.3s",
-                      "&:hover": { color: socialColors.pinterest },
-                    }}
-                  >
-                    <PinterestIcon />
-                  </IconButton>
-                )}
-                {instructorData.social.youtube && (
-                  <IconButton
-                    href={instructorData.social.youtube}
-                    target="_blank"
-                    sx={{
-                      transition: "color 0.3s",
-                      "&:hover": { color: socialColors.youtube },
-                    }}
-                  >
-                    <YouTubeIcon />
-                  </IconButton>
-                )}
-              </Stack>
-            </Box>
-          </Stack>
-           <LeaveComment />
+          {/* Display students and lessons */}
+          <Stack direction="column" spacing={1} alignItems="flex-start" mt={2}>
+  {/* Students */}
+  <Stack direction="row" spacing={1} alignItems="center">
+    <PeopleIcon sx={{ color: "#FF6B00" }} />
+    <Typography variant="body1" color="text.primary">
+      <span >{totalStudents || 0} Students </span> {/* Default to 0 if no students */}
+    </Typography>
+  </Stack>
+
+  {/* Lessons */}
+    <Stack direction="row" spacing={1} alignItems="center">
+    <MenuBookIcon sx={{ color: '#FF6B00' }} />
+    <Typography variant="body1" color="text.primary">
+      <span>
+  {course.lessons || 0} Lesson{course.lessons !== 1 ? "s" : ""}
+</span>
+
+    </Typography>
+  </Stack>
+</Stack>
+
         </Box>
+      </Stack>
 
-       
+      <Typography variant="body1" color="text.primary" mt={2}>
+        LearnPress is a comprehensive WordPress LMS Plugin for WordPress. This is one of the best WordPress LMS Plugins which can be used to easily create & sell courses online.
+      </Typography>
+
+      <Stack direction="row" spacing={1} alignItems="center" mt={2}>
+        <Typography variant="body2" color="text.primary">Follow:</Typography>
+        <IconButton href={instructorData.social.facebook} target="_blank"><FacebookIcon sx={{ color: "#555" }} /></IconButton>
+        <IconButton href={instructorData.social.pinterest} target="_blank"><PinterestIcon sx={{ color: "#555" }} /></IconButton>
+        <IconButton href={instructorData.social.twitter} target="_blank"><TwitterIcon sx={{ color: "#555" }} /></IconButton>
+        <IconButton href={instructorData.social.instagram} target="_blank"><InstagramIcon sx={{ color: "#555" }} /></IconButton>
+        <IconButton href={instructorData.social.youtube} target="_blank"><YouTubeIcon sx={{ color: "#555" }} /></IconButton>
+      </Stack>
+
+      <Box mt={3}>
+        <LeaveComment />
       </Box>
     </Box>
   );

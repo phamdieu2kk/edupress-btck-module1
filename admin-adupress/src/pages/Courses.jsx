@@ -33,15 +33,12 @@ const Courses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(8);
   const [total, setTotal] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
 
-  const commonCellSx = {
-    fontWeight: 600,
-    fontSize: "0.875rem",
-  };
+  const commonCellSx = { fontWeight: 600, fontSize: "0.875rem" };
 
   const fetchCourses = async (page = 0, limit = 5) => {
     try {
@@ -84,8 +81,9 @@ const Courses = () => {
     setPage(0);
   };
 
+  
   return (
-    <Box sx={{ p: isMobile ? 1 : 3 }}>
+    <Box>
       <Box
         sx={{
           display: "flex",
@@ -128,69 +126,71 @@ const Courses = () => {
             <Table sx={{ minWidth: 650 }}>
               <TableHead sx={{ bgcolor: "#FFF3E0" }}>
                 <TableRow>
-                  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
-                    No.
-                  </TableCell>
-                  <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>
-                    Course Name
-                  </TableCell>
+                  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>No.</TableCell>
+                  <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>Course Name</TableCell>
                   {!isMobile && (
                     <>
                       <TableCell sx={{ ...commonCellSx, color: "#FB8C00" }}>Author</TableCell>
-                      <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
-                        Price
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          ...commonCellSx,
-                          color: "#FB8C00",
-                          maxWidth: "250px",
-                        }}
-                      >
-                        Description
-                      </TableCell>
+                      <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>Price</TableCell>
+                      <TableCell sx={{ ...commonCellSx, color: "#FB8C00", maxWidth: "250px" }}>Description</TableCell>
+                      {/* <-- Thêm cột Status ở đây */}
+                      <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>Status</TableCell>
                     </>
                   )}
-                  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>
-                    Actions
-                  </TableCell>
+                  <TableCell align="center" sx={{ ...commonCellSx, color: "#FB8C00" }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
                 {courses.length > 0 ? (
                   courses.map((course, index) => (
-                    <TableRow
-                      key={course._id}
-                      sx={{ "&:hover": { backgroundColor: "rgba(251,140,0,0.05)" } }}
-                    >
-                      <TableCell align="center" sx={commonCellSx}>
+                    <TableRow key={course._id} sx={{ "&:hover": { backgroundColor: "rgba(251,140,0,0.05)" } }}>
+                      <TableCell align="center" sx={{ fontWeight: 600, fontSize: "0.825rem", py: 0.8, px: 1 }}>
                         {page * pageSize + index + 1}
                       </TableCell>
 
-                      {/* Course Name + thumbnail */}
-                      <TableCell sx={{ ...commonCellSx, cursor: "pointer" }} onClick={() =>
-                        navigate(`/admin/lessons/${course._id}`, { state: { courseName: course.title } })
-                      }>
-                        <Stack direction="row" alignItems="center" spacing={1}>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "0.825rem", 
+                          py: 0.8,
+                          px: 1,
+                          cursor: "pointer",
+                          maxWidth: 250,             
+                          whiteSpace: "normal",      
+                          overflowWrap: "break-word",
+                        }}
+                        onClick={() => navigate(`/admin/lessons/${course._id}`, { state: { courseName: course.title } })}
+                      >
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
                           <Box
-  component="img"
-  src={course.image || "https://edupress.thimpress.com/wp-content/uploads/2024/01/create-an-lms-website-with-learnpress-5-1-800x488.jpg"}
-  alt={course.title}
-  sx={{ width: 50, height: 50, objectFit: "cover", borderRadius: 1 }}
-/>
-
+                            component="img"
+                            src={course?.image && course.image.trim() !== "" ? course.image : "https://dummyimage.com/50x50/cccccc/fff.png&text=No+Img"}
+                            sx={{ width: 45, height: 45, objectFit: "cover", borderRadius: 2, boxShadow: 0.5 }}
+                          />
                           <Typography
-                            sx={{ color: "#1976d2", "&:hover": { textDecoration: "underline" }, fontWeight: 600 }}
-                          >
-                            {course.title}
-                          </Typography>
+  sx={{
+    color: "#000000ff",              // màu chữ mặc định (xanh đẹp cho admin)
+    fontWeight: 600,
+    fontSize: "0.825rem",
+    wordBreak: "break-word",
+    cursor: "pointer",
+    "&:hover": { 
+      textDecoration: "underline",
+      color: "#FB8C00"             // màu hover đậm hơn
+    }
+  }}
+>
+  {course.title}
+</Typography>
+
                         </Stack>
                       </TableCell>
 
+
                       {!isMobile && (
                         <>
-                          <TableCell sx={commonCellSx}>{course.instructor}</TableCell>
+                          <TableCell sx={{ fontWeight: 600, fontSize: "0.825rem", py: 0.8, px: 1 }}>{course.instructor}</TableCell>
                           <TableCell align="center" sx={commonCellSx}>
                             {course.price === 0 && course.originalPrice > 0 ? (
                               <Box display="flex" flexDirection="column" alignItems="center">
@@ -242,21 +242,40 @@ const Courses = () => {
                               </Typography>
                             )}
                           </TableCell>
-                          <TableCell
-                            sx={{
-                              maxWidth: "250px",
-                              whiteSpace: "normal",
-                              fontStyle: "italic",
-                              fontSize: "0.8rem",
-                            }}
-                          >
+                          <TableCell sx={{ maxWidth: 150, whiteSpace: "normal", fontStyle: "italic", fontSize: "0.75rem", py: 0.8, px: 1 }}>
                             {course.description}
                           </TableCell>
+                          {/* <-- Status */}
+                         <TableCell align="center" sx={{ py: 0.8 }}>
+  <Button
+    variant="contained"
+    sx={{
+      backgroundColor:
+        course.status === "active" ? "#4CAF50" : "#F44336", // Xanh cho active, đỏ cho inactive
+      color: "#ffffff", // Chữ màu trắng
+      fontSize: "0.65rem", // Giảm kích thước chữ
+      fontWeight: 600,
+      padding: "1px 6px", // Giảm khoảng cách padding (thun gọn hơn)
+      width: "auto", // Tự động điều chỉnh chiều rộng phù hợp với nội dung
+      minWidth: "60px", // Đặt chiều rộng tối thiểu
+      textTransform: "none", // Không viết hoa tất cả chữ
+      "&:hover": {
+        backgroundColor:
+          course.status === "active" ? "#388E3C" : "#D32F2F", // Hover hiệu ứng
+      },
+    }}
+  >
+    {course.status === "active" ? "Active" : "Inactive"}
+  </Button>
+</TableCell>
+
+
+
                         </>
                       )}
 
-                      <TableCell align="center">
-                        <Stack direction="row" spacing={1} justifyContent="center">
+                      <TableCell align="center" sx={{ py: 0.8, px: 1 }}>
+                        <Stack direction="row" spacing={0.5} justifyContent="center">
                           <IconButton size="small" color="primary" onClick={() => handleEdit(course)}>
                             <EditIcon sx={{ fontSize: "1rem" }} />
                           </IconButton>
@@ -269,7 +288,7 @@ const Courses = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={isMobile ? 3 : 6} align="center" sx={{ fontSize: "0.8rem" }}>
+                    <TableCell colSpan={isMobile ? 3 : 7} align="center" sx={{ fontSize: "0.8rem", py: 1 }}>
                       Không có khóa học nào
                     </TableCell>
                   </TableRow>

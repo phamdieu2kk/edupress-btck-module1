@@ -21,6 +21,9 @@ import Reviews from "./CourseDetailTabs/Reviews";
 import SidebarCourseCard from "@/components/courses/SidebarCourseCard";
 import Footer from "../../pages/Footer";
 
+// Thêm import hook
+import useCourseLessons from "@/hook/useCourseLessons";
+
 function TabPanel({ children, value, index, ...other }) {
   return (
     <div role="tabpanel" hidden={value !== index} {...other}>
@@ -60,6 +63,9 @@ const CourseDetail = () => {
     fetchCourse();
   }, [id]);
 
+  // --- Sử dụng hook useCourseLessons ---
+  const { totalLessons } = useCourseLessons(course);
+
   if (loading)
     return (
       <Container sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
@@ -87,35 +93,39 @@ const CourseDetail = () => {
 
   return (
     <>
-      <Breadcrumbs paths={breadcrumbPaths} />
+      {/* Outer Box Wrapper */}
+      <Box sx={{ backgroundColor: "#f5f5f5", paddingBottom: 4 }}>
+        <Breadcrumbs paths={breadcrumbPaths} />
 
-      {/* Hero Section with Desktop Sidebar Overlay */}
-      <Box sx={{ position: "relative", width: "100%" }}>
-        <CourseHeroSection course={course} />
+        {/* Hero Section with Desktop Sidebar Overlay */}
+        <Box sx={{ position: "relative", width: "100%" }}>
+          {/* Truyền totalLessons nếu muốn dùng trực tiếp trong HeroSection */}
+          <CourseHeroSection course={{ ...course, totalLessons }} />
 
-        {/* Sidebar overlay for desktop only */}
-        <Box
-          sx={{
-            position: { xs: "relative", md: "absolute" },
-            top: { xs: 0, md: 120 },
-            right: { xs: "auto", md: 180 },
-            width: { xs: "100%", md: 340 },
-            mx: { xs: 0, md: 0 },
-            zIndex: 10,
-            display: { xs: "none", md: "block" },
-          }}
-        >
-          <SidebarCourseCard course={course} />
+          {/* Sidebar overlay for desktop only */}
+          <Box
+            sx={{
+              position: { xs: "relative", md: "absolute" },
+              top: { xs: 0, md: 120 },
+              right: { xs: "auto", md: 180 },
+              width: { xs: "100%", md: 340 },
+              zIndex: 10,
+              display: { xs: "none", md: "block" },
+            }}
+          >
+            <SidebarCourseCard course={{ ...course, totalLessons }} />
+          </Box>
         </Box>
-      </Box>
 
-      {/* Main Content: Tabs and Sections */}
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        {/* Main Content: Tabs and Sections */}
         <Box
           sx={{
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
             gap: 4,
+            mt: 4,
+            maxWidth: "lg",
+            mx: "auto",
           }}
         >
           {/* Mobile Sidebar (visible only on small screens) */}
@@ -127,59 +137,54 @@ const CourseDetail = () => {
               mt: { xs: 3, sm: 4 },
             }}
           >
-            <SidebarCourseCard course={course} />
+            <SidebarCourseCard course={{ ...course, totalLessons }} />
           </Box>
 
           {/* Tab Container */}
-       <Box
-  sx={{
-    flex: { xs: 1, md: 2.5 },
-    order: { xs: 2, md: 1 },
-    width: "100%",
-    maxWidth: { xs: "100%", md: "calc(100% - 360px)" }, // chừa space cho sidebar
-    mr: { xs: 0, md: 4 }, // desktop: cách sidebar 16px (4 * 4px)
-   
-    
-  }}
->
-  <Tabs
-  value={value}
-  onChange={handleChange}
-  indicatorColor="primary"
-  textColor="primary"
-  variant="scrollable"
-  scrollButtons="auto"
-  sx={{ borderBottom: 1, borderColor: "divider" }}
->
-  <Tab label="Overview" {...a11yProps(0)} />
-  <Tab label="Curriculum" {...a11yProps(1)} />
-  <Tab label="Instructor" {...a11yProps(2)} />
-  <Tab label="FAQs" {...a11yProps(3)} />       {/* Đổi FAQs sang tab 4 */}
-  <Tab label="Reviews" {...a11yProps(4)} />    {/* Reviews sang tab 5 */}
-</Tabs>
+          <Box
+            sx={{
+              flex: { xs: 1, md: 2.5 },
+              order: { xs: 2, md: 1 },
+              width: "100%",
+              maxWidth: { xs: "100%", md: "calc(100% - 340px - 32px)" },
+            }}
+          >
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{ borderBottom: 1, borderColor: "divider" }}
+            >
+              <Tab label="Overview" {...a11yProps(0)} />
+              <Tab label="Curriculum" {...a11yProps(1)} />
+              <Tab label="Instructor" {...a11yProps(2)} />
+              <Tab label="FAQs" {...a11yProps(3)} />
+              <Tab label="Reviews" {...a11yProps(4)} />
+            </Tabs>
 
-<TabPanel value={value} index={0} dir={theme.direction}>
-  <Overview course={course} />
-</TabPanel>
-<TabPanel value={value} index={1} dir={theme.direction}>
-  <CurriculumTab courseId={course._id} />
-</TabPanel>
-<TabPanel value={value} index={2} dir={theme.direction}>
-  <Instructor instructor={course.instructor} />
-</TabPanel>
-<TabPanel value={value} index={3} dir={theme.direction}>
-  <FAQs courseId={course._id} />              {/* Tab 4 = FAQs */}
-</TabPanel>
-<TabPanel value={value} index={4} dir={theme.direction}>
-  <Reviews courseId={course._id} />           {/* Tab 5 = Reviews */}
-</TabPanel>
-
-</Box>
-
-
+            <TabPanel value={value} index={0} dir={theme.direction}>
+              <Overview course={course} />
+            </TabPanel>
+            <TabPanel value={value} index={1} dir={theme.direction}>
+              <CurriculumTab courseId={course._id} courseDuration={course.duration} />
+            </TabPanel>
+            <TabPanel value={value} index={2} dir={theme.direction}>
+              <Instructor course={course} />
+            </TabPanel>
+            <TabPanel value={value} index={3} dir={theme.direction}>
+              <FAQs courseId={course._id} />
+            </TabPanel>
+            <TabPanel value={value} index={4} dir={theme.direction}>
+              <Reviews courseId={course._id} />
+            </TabPanel>
+          </Box>
         </Box>
-      </Container>
-      <Footer />
+
+        <Footer />
+      </Box>
     </>
   );
 };

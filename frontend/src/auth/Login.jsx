@@ -12,6 +12,7 @@ import {
   Typography,
   Snackbar,
   Alert,
+  Link,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
@@ -124,17 +125,26 @@ const Login = () => {
               ),
             }}
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                color="primary"
-                size="small"
-              />
-            }
-            label="Remember me"
-          />
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  color="primary"
+                  size="small"
+                />
+              }
+              label="Remember me"
+            />
+            <Link
+              href="/forgot-password"
+              variant="body2"
+              sx={{ color: "#000000ff",}}
+            >
+              Forgot password ?
+            </Link>
+          </Box>
           <Button
             fullWidth
             type="submit"

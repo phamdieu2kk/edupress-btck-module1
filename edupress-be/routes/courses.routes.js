@@ -5,19 +5,14 @@ const router = express.Router();
 
 // =================== GET ===================
 
-// GET /api/courses/check-title
-// Endpoint mới để kiểm tra trùng tên khóa học
+// Check trùng title
 router.get("/check-title", async (req, res) => {
   try {
     const { title, excludeId } = req.query;
-    if (!title) {
-      return res.status(400).json({ message: "Title is required" });
-    }
+    if (!title) return res.status(400).json({ message: "Title is required" });
 
-    const query = { title: { $regex: new RegExp(`^${title}$`, 'i') } }; // Case-insensitive exact match
-    if (excludeId) {
-      query._id = { $ne: excludeId }; // Loại trừ chính khóa học đang sửa
-    }
+    const query = { title: { $regex: new RegExp(`^${title}$`, 'i') } };
+    if (excludeId) query._id = { $ne: excludeId };
 
     const course = await Course.findOne(query);
     res.json({ exists: !!course });
@@ -27,7 +22,7 @@ router.get("/check-title", async (req, res) => {
   }
 });
 
-// GET /api/courses?page=1&limit=8&search=js&category=Commercial,Office&price=Free&review=4&level=Beginner
+// Lấy danh sách khóa học
 router.get("/", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -35,7 +30,6 @@ router.get("/", async (req, res) => {
     const skip = (page - 1) * limit;
 
     const filter = {};
-
     if (req.query.search) filter.title = { $regex: req.query.search, $options: "i" };
     if (req.query.category) filter.category = { $in: req.query.category.split(",") };
     if (req.query.instructor) filter.instructor = { $in: req.query.instructor.split(",") };
@@ -48,10 +42,7 @@ router.get("/", async (req, res) => {
     if (req.query.level && req.query.level !== "All levels") filter.level = req.query.level;
 
     const total = await Course.countDocuments(filter);
-    const courses = await Course.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const courses = await Course.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
     res.json({
       courses,
@@ -63,19 +54,20 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/courses/:id
+// Lấy chi tiết khóa học
 router.get("/:id", async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) return res.status(404).json({ message: "Course not found" });
-    res.json(course);
+    res.json(course); // trả về luôn image Base64 nếu có
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
 // =================== POST ===================
-// POST /api/courses
+
+// POST tạo khóa học (giữ nguyên)
 router.post("/", async (req, res) => {
   try {
     if (!req.body.slug && req.body.title) {
@@ -89,14 +81,37 @@ router.post("/", async (req, res) => {
   }
 });
 
+// POST tạo khóa học với Base64
+router.post("/base64", async (req, res) => {
+  try {
+    const { title, description, instructor, originalPrice, price, imageBase64 } = req.body;
+    if (!title || !instructor) return res.status(400).json({ message: "Title and instructor are required" });
+
+    const slug = slugify(title, { lower: true, strict: true });
+
+    const newCourse = await Course.create({
+      title,
+      slug,
+      description,
+      instructor,
+      originalPrice: originalPrice || 0,
+      price: price || 0,
+      image: imageBase64 || null, // lưu Base64
+    });
+
+    res.status(201).json(newCourse);
+  } catch (err) {
+    console.error("❌ Error creating course (Base64):", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // =================== PUT ===================
-// PUT /api/courses/:id
+
 router.put("/:id", async (req, res) => {
   try {
-    // Nếu title thay đổi, tự động cập nhật slug
-    if (req.body.title) {
-      req.body.slug = slugify(req.body.title, { lower: true, strict: true });
-    }
+    if (req.body.title) req.body.slug = slugify(req.body.title, { lower: true, strict: true });
+
     const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedCourse) return res.status(404).json({ message: "Course not found" });
     res.json(updatedCourse);
@@ -107,7 +122,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // =================== DELETE ===================
-// DELETE /api/courses/:id
+
 router.delete("/:id", async (req, res) => {
   try {
     const deletedCourse = await Course.findByIdAndDelete(req.params.id);

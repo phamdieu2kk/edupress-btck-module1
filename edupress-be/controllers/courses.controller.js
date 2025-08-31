@@ -3,18 +3,34 @@ const Lesson = require('../models/Lesson');
 const Enrollment = require('../models/Enrollment');
 const Review = require('../models/Review');
 const slugify = require("slugify");
-// Public: danh sách khoá học APPROVED (+search ?q=)
-// exports.listCourses = async (req, res) => {
-//   const q = { status: 'APPROVED' };
-//   if (req.query.q) q.title = { $regex: req.query.q, $options: 'i' };
-//   const courses = await Course.find(q).sort({ createdAt: -1 }).populate('provider', 'name');
-//   res.json(courses);
-// };
 
-// controllers/courseController.js
-// controllers/courseController.js
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
+const path = require("path");
 
+// ===== Multer setup =====
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // ảnh sẽ được lưu trong thư mục uploads/
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage });
 
+// Hàm xử lý duration
+const handleDuration = (duration) => {
+  if (typeof duration === "string") {
+    // Loại bỏ tất cả ký tự không phải là số hoặc từ "week"
+    const parsedDuration = duration.replace(/[^0-9]/g, "");
+    return parseInt(parsedDuration, 10) || 1;  // Trả về 1 nếu không phải số hợp lệ
+  }
+  return duration || 1;  // Nếu không có giá trị, trả về 1
+};
+
+// API: Liệt kê các khóa học
 exports.listCourses = async (req, res) => {
   try {
     const q = { status: "APPROVED" };
@@ -61,72 +77,95 @@ exports.listCourses = async (req, res) => {
   }
 };
 
-
-
-// Public: chi tiết khoá học (không trả nội dung bài học)
+// API: Chi tiết khóa học (không trả nội dung bài học)
 exports.getCourse = async (req, res) => {
-  const course = await Course.findById(req.params.id).populate('provider', 'name');
-  if (!course || course.status !== 'APPROVED') return res.status(404).json({ message: 'Course not found' });
-  res.json(course);
+  try {
+    const course = await Course.findById(req.params.id).populate('provider', 'name');
+    if (!course || course.status !== 'APPROVED') {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    res.json(course);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-// Customer: đăng ký khoá học
+// API: Đăng ký khóa học
 exports.enroll = async (req, res) => {
-  const { id } = req.params; // courseId
-  const course = await Course.findById(id);
-  if (!course || course.status !== 'APPROVED') return res.status(404).json({ message: 'Course not found' });
+  try {
+    const { id } = req.params; // courseId
+    const course = await Course.findById(id);
+    if (!course || course.status !== 'APPROVED') return res.status(404).json({ message: 'Course not found' });
 
-  const exists = await Enrollment.findOne({ user: req.user.id, course: id });
-  if (exists) return res.status(409).json({ message: 'Already enrolled' });
+    const exists = await Enrollment.findOne({ user: req.user.id, course: id });
+    if (exists) return res.status(409).json({ message: 'Already enrolled' });
 
-  const paid = course.price === 0;
-  const pricePaid = paid ? 0 : course.price;
-  const enroll = await Enrollment.create({ user: req.user.id, course: id, paid, pricePaid });
-  res.status(201).json(enroll);
+    const paid = course.price === 0;
+    const pricePaid = paid ? 0 : course.price;
+    const enroll = await Enrollment.create({ user: req.user.id, course: id, paid, pricePaid });
+    res.status(201).json(enroll);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-// Customer: danh sách khoá học đã đăng ký
+// API: Danh sách khóa học đã đăng ký của khách hàng
 exports.myCourses = async (req, res) => {
-  const list = await Enrollment.find({ user: req.user.id })
-    .sort({ createdAt: -1 })
-    .populate({ path: 'course', populate: { path: 'provider', select: 'name' } });
-  res.json(list);
+  try {
+    const list = await Enrollment.find({ user: req.user.id })
+      .sort({ createdAt: -1 })
+      .populate({ path: 'course', populate: { path: 'provider', select: 'name' } });
+    res.json(list);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-// Customer: lấy bài học của khoá học đã đăng ký
+// API: Lấy bài học của khóa học đã đăng ký
 exports.courseLessons = async (req, res) => {
-  const { id } = req.params; // courseId
-  const enrolled = await Enrollment.findOne({ user: req.user.id, course: id });
-  if (!enrolled) return res.status(403).json({ message: 'Not enrolled' });
+  try {
+    const { id } = req.params; // courseId
+    const enrolled = await Enrollment.findOne({ user: req.user.id, course: id });
+    if (!enrolled) return res.status(403).json({ message: 'Not enrolled' });
 
-  const lessons = await Lesson.find({ course: id }).sort({ order: 1 });
-  res.json(lessons);
+    const lessons = await Lesson.find({ course: id }).sort({ order: 1 });
+    res.json(lessons);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-// Customer: đánh giá khoá học
+// API: Đánh giá khóa học
 exports.reviewCourse = async (req, res) => {
-  const { id } = req.params; // courseId
-  const { rating, comment } = req.body;
+  try {
+    const { id } = req.params; // courseId
+    const { rating, comment } = req.body;
 
-  const enrolled = await Enrollment.findOne({ user: req.user.id, course: id });
-  if (!enrolled) return res.status(403).json({ message: 'Not enrolled' });
+    const enrolled = await Enrollment.findOne({ user: req.user.id, course: id });
+    if (!enrolled) return res.status(403).json({ message: 'Not enrolled' });
 
-  const review = await Review.create({ user: req.user.id, course: id, rating, comment });
-  res.status(201).json(review);
+    const review = await Review.create({ user: req.user.id, course: id, rating, comment });
+    res.status(201).json(review);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-
-
-
-
-
-
-// POST /api/courses
+// API: Tạo mới khóa học
 exports.createCourse = async (req, res) => {
   try {
+    // Xử lý trường 'duration' trước khi lưu
+    req.body.duration = handleDuration(req.body.duration);
+
     if (!req.body.slug && req.body.title) {
       req.body.slug = slugify(req.body.title, { lower: true, strict: true });
     }
+
     const newCourse = await Course.create(req.body);
     res.status(201).json(newCourse);
   } catch (err) {
@@ -135,9 +174,12 @@ exports.createCourse = async (req, res) => {
   }
 };
 
-// Update a course by ID (PUT /api/courses/:id)
+// API: Cập nhật khóa học theo ID
 exports.updateCourse = async (req, res) => {
   try {
+    // Xử lý trường 'duration' trước khi cập nhật
+    req.body.duration = handleDuration(req.body.duration);
+
     const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedCourse) return res.status(404).json({ message: "Course not found" });
     res.json(updatedCourse);
@@ -147,7 +189,7 @@ exports.updateCourse = async (req, res) => {
   }
 };
 
-// Delete a course by ID (DELETE /api/courses/:id)
+// API: Xóa khóa học theo ID
 exports.deleteCourse = async (req, res) => {
   try {
     const deletedCourse = await Course.findByIdAndDelete(req.params.id);
@@ -159,11 +201,7 @@ exports.deleteCourse = async (req, res) => {
   }
 };
 
-
-
-
-
-// GET /api/courses/with-lessons
+// API: Lấy tất cả khóa học kèm bài học
 exports.getCoursesWithLessons = async (req, res) => {
   try {
     const courses = await Course.find()

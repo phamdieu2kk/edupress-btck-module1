@@ -32,6 +32,8 @@ const CourseList = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [totalActiveCourses, setTotalActiveCourses] = useState(0);
+  const [allActiveCourses, setAllActiveCourses] = useState([]);
 
   const [filter, setFilter] = useState({
     category: [],
@@ -44,6 +46,7 @@ const CourseList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const itemsPerPage = 8;
+  const API_URL = "http://localhost:5000";
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
 
@@ -65,38 +68,79 @@ const CourseList = () => {
     }
   }, [location.search]);
 
-  const fetchCourses = async () => {
-    setLoading(true);
-    try {
-      const params = {
-        page: currentPage,
-        limit: itemsPerPage,
-      };
-
-      if (searchText) params.search = searchText;
-      if (filter.category.length) params.category = filter.category.join(",");
-      if (filter.instructor.length) params.instructor = filter.instructor.join(",");
-      if (filter.price !== "All") params.price = filter.price;
-      if (filter.review) params.review = filter.review;
-      if (filter.level !== "All levels") params.level = filter.level;
-
-      const res = await axios.get("http://localhost:5000/api/courses", { params });
-
-      const courseData = Array.isArray(res.data.courses) ? res.data.courses : [];
-      setCourses(courseData);
-
-      setTotalPages(res.data.pagination?.totalPages || 1);
-    } catch (err) {
-      console.error(err);
-      setError("Cannot load courses");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // First fetch to get all courses and store them
   useEffect(() => {
-    fetchCourses();
-  }, [currentPage, filter, searchText]);
+    const fetchAllCourses = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`${API_URL}/api/courses`, {
+          params: { limit: 100 }, // Cố định limit để lấy một lượng lớn dữ liệu
+        });
+        const allFetchedCourses = Array.isArray(res.data.courses) ? res.data.courses : [];
+        const activeData = allFetchedCourses.filter((course) => course.status === "active");
+        setAllActiveCourses(activeData);
+        setTotalActiveCourses(activeData.length);
+        setTotalPages(Math.ceil(activeData.length / itemsPerPage));
+      } catch (err) {
+        console.error(err);
+        setError("Cannot load courses");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllCourses();
+  }, []);
+
+  // Filter and paginate based on state changes
+  useEffect(() => {
+    let filteredData = allActiveCourses;
+
+    // Apply search filter
+    if (searchText) {
+      filteredData = filteredData.filter((course) =>
+        course.title.toLowerCase().includes(searchText.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply other filters
+    if (filter.category.length) {
+      filteredData = filteredData.filter((course) =>
+        filter.category.includes(course.category)
+      );
+    }
+
+    if (filter.instructor.length) {
+      filteredData = filteredData.filter((course) =>
+        filter.instructor.includes(course.instructor)
+      );
+    }
+    if (filter.price !== "All") {
+      filteredData = filteredData.filter((course) => {
+        if (filter.price === "Free" && course.price === 0) return true;
+        if (filter.price === "Paid" && course.price > 0) return true;
+        return false;
+      });
+    }
+
+    if (filter.review > 0) {
+      filteredData = filteredData.filter((course) => course.rating >= filter.review);
+    }
+
+    if (filter.level !== "All levels") {
+      filteredData = filteredData.filter((course) => course.level === filter.level);
+    }
+    
+    // Update pagination based on filtered data
+    setTotalActiveCourses(filteredData.length);
+    setTotalPages(Math.ceil(filteredData.length / itemsPerPage));
+
+    // Slice data for current page
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    setCourses(filteredData.slice(start, end));
+
+  }, [currentPage, filter, searchText, allActiveCourses]);
 
   const handleCategoryClick = (category) => {
     navigate(`/courses?category=${encodeURIComponent(category)}`);
@@ -190,24 +234,22 @@ const CourseList = () => {
               {courses.length === 0 ? (
                 <Typography variant="body1">No courses found.</Typography>
               ) : viewMode === "grid" ? (
-                // SỬ DỤNG FLEXBOX KẾT HỢP WIDTH ĐỂ CHỈ HIỂN THỊ 2 CỘT
                 <Box
                   display="flex"
                   flexWrap="wrap"
                   gap={3}
-                  justifyContent="flex-start" // Căn lề trái để card lẻ không bị giãn
+                  justifyContent="flex-start"
                 >
                   {courses.map((course) => (
                     <Box
                       key={course._id}
                       sx={{
-                        // Chiều rộng card responsive
                         width: {
-                          xs: "100%", // Mobile: 1 cột
-                          sm: "calc(50% - 12px)", // Tablet và Desktop: 2 cột
-                          md: "calc(50% - 12px)", // Thêm md để đảm bảo trên desktop cũng 2 cột
+                          xs: "100%",
+                          sm: "calc(50% - 12px)",
+                          md: "calc(50% - 12px)",
                         },
-                        flexGrow: 0, // Quan trọng: Ngăn card giãn ra
+                        flexGrow: 0,
                         flexShrink: 0,
                         flexBasis: "auto",
                       }}
@@ -257,10 +299,9 @@ const CourseList = () => {
           />
         </Box>
       </Drawer>
-
       <Footer />
     </>
-  );
+  );z
 };
 
 export default CourseList;

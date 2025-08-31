@@ -1,4 +1,3 @@
-// src/components/courses/CourseCard.jsx
 import React from "react";
 import {
   Card,
@@ -17,10 +16,18 @@ import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import PeopleIcon from "@mui/icons-material/People";
 import { Link } from "react-router-dom";
+import useCourseLessons from "../../hook/useCourseLessons";
 
 const CourseCard = ({ course, variant = "grid" }) => {
   const isList = variant === "list";
   const cardLink = `/courses/${course._id}`;
+
+  // Hook lấy sections để tính tổng lessons
+  const { sections, loading } = useCourseLessons(course._id);
+  const totalLessons = sections.reduce(
+    (total, s) => total + (s.subLessons?.length || 0),
+    0
+  );
 
   const renderListInfoIcons = () => (
     <Stack direction="row" spacing={1.5} flexWrap="wrap" mb={1}>
@@ -31,7 +38,7 @@ const CourseCard = ({ course, variant = "grid" }) => {
           color="text.primary"
           sx={{ fontSize: { xs: "0.6rem", sm: "0.65rem", md: "0.75rem" } }}
         >
-          {course.duration || "2 Weeks"}
+          {course.duration ? `${course.duration} Weeks` : "2 Weeks"}
         </Typography>
       </Stack>
       <Stack direction="row" spacing={0.5} alignItems="center">
@@ -61,7 +68,7 @@ const CourseCard = ({ course, variant = "grid" }) => {
           color="text.primary"
           sx={{ fontSize: { xs: "0.6rem", sm: "0.65rem", md: "0.75rem" } }}
         >
-          {course.lessons || 0} Lessons
+          {loading ? "..." : totalLessons} Lessons
         </Typography>
       </Stack>
     </Stack>
@@ -76,7 +83,7 @@ const CourseCard = ({ course, variant = "grid" }) => {
           color="text.primary"
           sx={{ fontSize: { xs: "0.6rem", sm: "0.7rem", md: "0.75rem" } }}
         >
-          {course.duration || "2 Weeks"}
+          {course.duration ? `${course.duration} Weeks` : "2 Weeks"}
         </Typography>
       </Stack>
       <Stack direction="row" spacing={0.5} alignItems="center">
@@ -89,6 +96,7 @@ const CourseCard = ({ course, variant = "grid" }) => {
           {course.students || 0} Students
         </Typography>
       </Stack>
+      
     </Stack>
   );
 

@@ -4,6 +4,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const path = require("path");
 
 // ===== Import routes =====
 const authRoutes = require("./routes/auth.routes");
@@ -34,6 +35,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// ===== Static: Serve thư mục uploads =====
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // ===== Routes =====
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.use("/api/auth", authRoutes);
@@ -42,6 +46,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/lessons", lessonRoutes);
 app.use("/api/instructors", instructorRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ===== Connect Database & Start Server =====
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/edupress";

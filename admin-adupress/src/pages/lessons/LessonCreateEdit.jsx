@@ -1,4 +1,3 @@
-// src/pages/lessons/LessonCreateEdit.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -29,6 +28,7 @@ const LessonCreateEdit = () => {
     section: "",
     order: 1,
     courseId: courseId || "",
+    lessons: 0, // Khởi tạo trường lessons
     subLessons: [{ title: "", duration: "" }],
   });
 
@@ -37,6 +37,14 @@ const LessonCreateEdit = () => {
     message: "",
     severity: "success",
   });
+
+  // Tính tổng số bài học
+  const updateLessonsCount = () => {
+    setLesson((prevLesson) => ({
+      ...prevLesson,
+      lessons: prevLesson.subLessons.length, // Số lượng bài học = số lượng subLessons
+    }));
+  };
 
   // Load dữ liệu khi edit
   useEffect(() => {
@@ -65,21 +73,27 @@ const LessonCreateEdit = () => {
     const { name, value } = e.target;
     const updated = [...lesson.subLessons];
     updated[index][name] = value;
-    setLesson({ ...lesson, subLessons: updated });
+    setLesson({ ...lesson, subLessons: updated }, updateLessonsCount); // Cập nhật số lượng bài học
   };
 
   const handleAddSubLesson = () => {
-    setLesson({
-      ...lesson,
-      subLessons: [...lesson.subLessons, { title: "", duration: "" }],
-    });
+    setLesson(
+      {
+        ...lesson,
+        subLessons: [...lesson.subLessons, { title: "", duration: "" }],
+      },
+      updateLessonsCount // Tính lại số lượng bài học
+    );
   };
 
   const handleRemoveSubLesson = (index) => {
-    setLesson({
-      ...lesson,
-      subLessons: lesson.subLessons.filter((_, i) => i !== index),
-    });
+    setLesson(
+      {
+        ...lesson,
+        subLessons: lesson.subLessons.filter((_, i) => i !== index),
+      },
+      updateLessonsCount // Tính lại số lượng bài học
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -260,8 +274,7 @@ const LessonCreateEdit = () => {
               mt={2}
               justifyContent="flex-end"
             >
-
-             <Button
+              <Button
                 variant="outlined"
                 sx={{
                   borderColor: "orange",
@@ -283,8 +296,6 @@ const LessonCreateEdit = () => {
               >
                 {id ? "Cập nhật" : "Tạo mới"}
               </Button>
-
-             
             </Stack>
           </Stack>
         </form>

@@ -5,22 +5,31 @@ import PeopleIcon from "@mui/icons-material/People";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 
+import useCourseLessons from "../../hook/useCourseLessons";
+
 const CourseHeroSection = ({ course }) => {
+  // Dùng hook để lấy lesson/subLesson
+  const { sections, loading } = useCourseLessons(course._id);
+
+  // Tính tổng lessons từ hook
+  const totalLessons = sections.reduce(
+    (total, s) => total + (s.subLessons?.length || 0),
+    0
+  );
+
   return (
-    // Full width background
     <Box
       sx={{
         width: "100%",
         backgroundColor: "#1E293B",
-        py: { xs: 4, md: 6 }, // padding top/bottom
+        py: { xs: 6, md: 8 },
         boxShadow: "0px 8px 30px rgba(0,0,0,0.3)",
       }}
     >
-      {/* Inner content container: căn theo các tab */}
       <Box
         sx={{
-          maxWidth: "lg", // bằng container maxWidth="lg"
-          mx: "auto", // căn giữa
+          maxWidth: "lg",
+          mx: "auto",
           px: { xs: 2, md: 4 },
           display: "flex",
           flexDirection: "column",
@@ -28,7 +37,6 @@ const CourseHeroSection = ({ course }) => {
           color: "#fff",
         }}
       >
-        {/* Title, Category, Meta */}
         <Stack direction="row" spacing={1} mb={1} alignItems="center">
           <Chip
             label={course.category || " "}
@@ -64,33 +72,35 @@ const CourseHeroSection = ({ course }) => {
           {course.title || "Creative Studio Spaces"}
         </Typography>
 
-        {/* <Typography variant="subtitle1" color="#cbd5e1" sx={{ mb: 2 }}>
-          {course.description}
-        </Typography> */}
-
         <Stack direction="row" spacing={3} flexWrap="wrap">
           <Stack direction="row" spacing={0.5} alignItems="center">
-            <AccessTimeIcon fontSize="small" sx={{ color: "#FFB300" }} />
-            <Typography variant="body2" sx={{ color: "#ddd" }}>
-              {course.duration || "1 Week"}
+            <AccessTimeIcon fontSize="small" sx={{ color: "#FF6B00" }} />
+            <Typography variant="body2" sx={{ color: "#fff" }}>
+              {course.duration ? `${course.duration} Weeks` : "2 Weeks"}
             </Typography>
           </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <PeopleIcon fontSize="small" sx={{ color: "#FFB300" }} />
-            <Typography variant="body2" sx={{ color: "#ddd" }}>
-              {course.student || "Students"}
+
+          <Stack direction="row" spacing={1} alignItems="center">
+            <PeopleIcon sx={{ color: "#FF6B00" }} />
+            <Typography variant="body1" sx={{ color: "#fff" }}>
+              Student: <span style={{ fontWeight: 600 }}>{course.students || "0"}</span>
             </Typography>
           </Stack>
+
           <Stack direction="row" spacing={0.5} alignItems="center">
-            <SignalCellularAltIcon fontSize="small" sx={{ color: "#FFB300" }} />
-            <Typography variant="body2" sx={{ color: "#ddd" }}>
+            <SignalCellularAltIcon fontSize="small" sx={{ color: "#FF6B00" }} />
+            <Typography variant="body2" sx={{ color: "#fff" }}>
               {course.level || "Intermediate"}
             </Typography>
           </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <MenuBookIcon fontSize="small" sx={{ color: "#FFB300" }} />
-            <Typography variant="body2" sx={{ color: "#ddd" }}>
-              {course.lessons || "8"} Lessons
+
+          <Stack direction="row" spacing={1} alignItems="center">
+            <MenuBookIcon sx={{ color: "#FF6B00" }} />
+            <Typography variant="body1" sx={{ color: "#fff" }}>
+              <span style={{ fontWeight: 600 }}>
+                {loading ? "..." : totalLessons}
+              </span>{" "}
+              Lesson{totalLessons !== 1 ? "s" : ""}
             </Typography>
           </Stack>
         </Stack>
