@@ -1,21 +1,43 @@
 import React from "react";
 import { Box, Typography, Chip, Stack } from "@mui/material";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import PeopleIcon from "@mui/icons-material/People";
-import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
-
+import {
+  AccessTime as AccessTimeIcon,
+  People as PeopleIcon,
+  SignalCellularAlt as SignalCellularAltIcon,
+  MenuBook as MenuBookIcon,
+} from "@mui/icons-material";
 import useCourseLessons from "../../hook/useCourseLessons";
 
 const CourseHeroSection = ({ course }) => {
-  // Dùng hook để lấy lesson/subLesson
   const { sections, loading } = useCourseLessons(course._id);
-
-  // Tính tổng lessons từ hook
   const totalLessons = sections.reduce(
     (total, s) => total + (s.subLessons?.length || 0),
     0
   );
+
+  // Mảng info để map, tránh lặp code
+  const infoList = [
+    {
+      icon: <AccessTimeIcon fontSize="small" sx={{ color: "#FF6B00" }} />,
+      value: course.duration ? `${course.duration} Weeks` : "2 Weeks",
+    },
+    {
+      icon: <PeopleIcon sx={{ color: "#FF6B00" }} />,
+      label: "Student",
+      value: course.students || "0",
+      isBold: true,
+    },
+    {
+      icon: <SignalCellularAltIcon fontSize="small" sx={{ color: "#FF6B00" }} />,
+      value: course.level || "Intermediate",
+    },
+    {
+      icon: <MenuBookIcon sx={{ color: "#FF6B00" }} />,
+      value: loading ? "..." : totalLessons,
+      suffix: `Lesson${totalLessons !== 1 ? "s" : ""}`,
+      isBold: true,
+    },
+  ];
 
   return (
     <Box
@@ -73,36 +95,16 @@ const CourseHeroSection = ({ course }) => {
         </Typography>
 
         <Stack direction="row" spacing={3} flexWrap="wrap">
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <AccessTimeIcon fontSize="small" sx={{ color: "#FF6B00" }} />
-            <Typography variant="body2" sx={{ color: "#fff" }}>
-              {course.duration ? `${course.duration} Weeks` : "2 Weeks"}
-            </Typography>
-          </Stack>
-
-          <Stack direction="row" spacing={1} alignItems="center">
-            <PeopleIcon sx={{ color: "#FF6B00" }} />
-            <Typography variant="body1" sx={{ color: "#fff" }}>
-              Student: <span style={{ fontWeight: 600 }}>{course.students || "0"}</span>
-            </Typography>
-          </Stack>
-
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <SignalCellularAltIcon fontSize="small" sx={{ color: "#FF6B00" }} />
-            <Typography variant="body2" sx={{ color: "#fff" }}>
-              {course.level || "Intermediate"}
-            </Typography>
-          </Stack>
-
-          <Stack direction="row" spacing={1} alignItems="center">
-            <MenuBookIcon sx={{ color: "#FF6B00" }} />
-            <Typography variant="body1" sx={{ color: "#fff" }}>
-              <span style={{ fontWeight: 600 }}>
-                {loading ? "..." : totalLessons}
-              </span>{" "}
-              Lesson{totalLessons !== 1 ? "s" : ""}
-            </Typography>
-          </Stack>
+          {infoList.map((item, idx) => (
+            <Stack key={idx} direction="row" spacing={0.5} alignItems="center">
+              {item.icon}
+              <Typography variant="body2" sx={{ color: "#fff" }}>
+                {item.label ? `${item.label}: ` : ""}
+                {item.isBold ? <span style={{ fontWeight: 600 }}>{item.value}</span> : item.value}{" "}
+                {item.suffix || ""}
+              </Typography>
+            </Stack>
+          ))}
         </Stack>
       </Box>
     </Box>

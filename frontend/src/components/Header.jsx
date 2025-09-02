@@ -1,33 +1,69 @@
-// src/components/Navbar.jsx
-import { Link } from "react-router-dom";
+// src/components/Header.jsx
+import React, { useState } from "react";
+import { Button, Menu, MenuItem } from "@mui/material";
+import { ArrowDropDown as ArrowDropDownIcon } from "@mui/icons-material";
+import { Link, useLocation } from "react-router-dom";
 
-export default function Navbar() {
+function Header({ navLinkStyle, pageLinks }) {
+  const location = useLocation();
+  const [anchorElPage, setAnchorElPage] = useState(null);
+
+  const handleOpen = (setter) => (event) => setter(event.currentTarget);
+  const handleClose = (setter) => () => setter(null);
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
   return (
-    <header className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="text-2xl font-bold text-blue-600">
-          EduPress
-        </Link>
-
-        {/* Menu điều hướng */}
-        <nav className="hidden md:flex space-x-6 text-gray-700 font-medium">
-          <Link to="/" className="hover:text-blue-600">Trang chủ</Link>
-          <Link to="/courses" className="hover:text-blue-600">Khóa học</Link>
-          <Link to="/about" className="hover:text-blue-600">Về chúng tôi</Link>
-          <Link to="/contact" className="hover:text-blue-600">Liên hệ</Link>
-        </nav>
-
-        {/* Nút hành động */}
-        <div className="space-x-2">
-          <Link to="/login" className="px-4 py-2 text-sm border border-blue-600 text-blue-600 rounded hover:bg-blue-50">
-            Đăng nhập
-          </Link>
-          <Link to="/register" className="px-4 py-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-700">
-            Đăng ký
-          </Link>
-        </div>
-      </div>
-    </header>
+    <>
+      <Button component={Link} to="/" sx={navLinkStyle(isActive("/"))}>
+        Home
+      </Button>
+      <Button
+        component={Link}
+        to="/courses"
+        sx={navLinkStyle(isActive("/courses"))}
+      >
+        Courses
+      </Button>
+      <Button
+        component={Link}
+        to="/blog"
+        sx={navLinkStyle(isActive("/blog"))}
+      >
+        Blog
+      </Button>
+      <Button
+        onClick={handleOpen(setAnchorElPage)}
+        endIcon={<ArrowDropDownIcon />}
+        sx={navLinkStyle(pageLinks.some((p) => isActive(p.path)))}
+      >
+        Page
+      </Button>
+      <Menu
+        anchorEl={anchorElPage}
+        open={Boolean(anchorElPage)}
+        onClose={handleClose(setAnchorElPage)}
+      >
+        {pageLinks.map((link) => (
+          <MenuItem
+            key={link.path}
+            component={Link}
+            to={link.path}
+            onClick={handleClose(setAnchorElPage)}
+          >
+            {link.label}
+          </MenuItem>
+        ))}
+      </Menu>
+      <Button
+        component={Link}
+        to="/premium-themes"
+        sx={navLinkStyle(isActive("/premium-themes"))}
+      >
+        Premium Theme
+      </Button>
+    </>
   );
 }
+
+export default Header;

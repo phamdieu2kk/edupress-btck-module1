@@ -43,6 +43,11 @@ const LEVELS = [
   { label: "Beginner", value: "Beginner" },
 ];
 
+const STATUSES = [
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
+];
+
 const CourseDetail = ({ open, onClose, onSaved, course }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -54,10 +59,10 @@ const CourseDetail = ({ open, onClose, onSaved, course }) => {
     price: 0,
     originalPrice: 0,
     status: "active",
-    duration: 1,   // Default duration to 1
-    level: "all",  // Default level
-    students: 0,   // Default students
-    lessons: 0,    // Default lessons
+    duration: 1,
+    level: "Beginner",
+    students: 0,
+    lessons: 0,
   });
   const [category, setCategory] = useState("");
   const [preview, setPreview] = useState(PLACEHOLDER_IMAGE);
@@ -74,9 +79,9 @@ const CourseDetail = ({ open, onClose, onSaved, course }) => {
         instructor: course.instructor || "",
         price: course.price || 0,
         originalPrice: course.originalPrice || 0,
-        status: course.status || "active",
-        duration: course.duration || 1,  // Set duration to course value or default to 1
-        level: course.level || "all",
+        status: STATUSES.some(s => s.value === course.status) ? course.status : "active",
+        duration: course.duration || 1,
+        level: LEVELS.some(l => l.value === course.level) ? course.level : "Beginner",
         students: course.students || 0,
         lessons: course.lessons || 0,
       });
@@ -91,9 +96,9 @@ const CourseDetail = ({ open, onClose, onSaved, course }) => {
         instructor: "",
         price: 0,
         originalPrice: 0,
-        status: "Active",
-        duration: 1,   // Default duration to 1
-        level: "All level",
+        status: "active",
+        duration: 1,
+        level: "Beginner",
         students: 0,
         lessons: 0,
       });
@@ -119,7 +124,17 @@ const CourseDetail = ({ open, onClose, onSaved, course }) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const payload = { ...form, category };
+      const payload = {
+        ...form,
+        category,
+        price: Number(form.price),
+        originalPrice: Number(form.originalPrice),
+        duration: Number(form.duration),
+        students: Number(form.students),
+        lessons: Number(form.lessons),
+        level: LEVELS.some(l => l.value === form.level) ? form.level : "Beginner",
+        status: STATUSES.some(s => s.value === form.status) ? form.status : "active",
+      };
       if (newImageBase64) payload.image = newImageBase64;
 
       if (course) {
@@ -171,36 +186,38 @@ const CourseDetail = ({ open, onClose, onSaved, course }) => {
             </Select>
           </FormControl>
 
-          {/* Thời gian khóa học với từ "week" */}
           <TextField
             label="Khóa học bao nhiêu tuần"
             type="number"
             name="duration"
-            value={form.duration || 1}  // Default to 1 if no value is set
+            value={form.duration || 1}
             onChange={handleChange}
             fullWidth
             helperText="Nếu không nhập, mặc định là 1 tuần."
             InputProps={{
-              endAdornment: <Typography sx={{ marginLeft: 1 }}>Tuần</Typography>,  // Hiển thị từ "Tuần"
+              endAdornment: <Typography sx={{ marginLeft: 1 }}>Tuần</Typography>,
             }}
           />
 
-          {/* Level dropdown với các cấp độ */}
           <FormControl fullWidth>
             <InputLabel>Cấp độ</InputLabel>
             <Select name="level" value={form.level} onChange={handleChange} label="Cấp độ">
               {LEVELS.map((level) => (
-                <MenuItem key={level.value} value={level.value}>
-                  {level.label}
-                </MenuItem>
+                <MenuItem key={level.value} value={level.value}>{level.label}</MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          {/* Số lượng học viên */}
-          <TextField label="Số lượng học viên" type="number" name="students" value={form.students} onChange={handleChange} fullWidth />
+          <FormControl fullWidth>
+            <InputLabel>Trạng thái</InputLabel>
+            <Select name="status" value={form.status} onChange={handleChange} label="Trạng thái">
+              {STATUSES.map((s) => (
+                <MenuItem key={s.value} value={s.value}>{s.label}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          {/* Số lượng bài giảng */}
+          <TextField label="Số lượng học viên" type="number" name="students" value={form.students} onChange={handleChange} fullWidth />
           <TextField label="Số lượng bài giảng" type="number" name="lessons" value={form.lessons} onChange={handleChange} fullWidth />
 
           <Button variant="outlined" component="label">

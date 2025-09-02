@@ -7,7 +7,6 @@ import {
   Typography,
   Box,
   CircularProgress,
-  Divider,
   Button,
   Fade,
 } from "@mui/material";
@@ -38,14 +37,16 @@ const CurriculumTab = ({ courseId, courseDuration }) => {
     else setExpanded(sections.map((_, idx) => `panel${idx}`));
   };
 
+  // --------- Hàm formatDuration mới ----------
   const formatDuration = (totalMinutes) => {
     if (!totalMinutes) return "0 min";
+    if (totalMinutes < 60) return `${totalMinutes} mins`;
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    if (hours && minutes) return `${hours} hours ${minutes} mins`;
-    if (hours) return `${hours} hours`;
-    return `${minutes} mins`;
+    if (minutes === 0) return `${hours} hour${hours > 1 ? "s" : ""}`;
+    return `${hours} hour${hours > 1 ? "s" : ""} ${minutes} mins`;
   };
+  // ------------------------------------------
 
   if (loading)
     return (
@@ -63,15 +64,37 @@ const CurriculumTab = ({ courseId, courseDuration }) => {
           </Typography>
         )}
 
-        <Box sx={{ padding: 3, borderRadius: 2, boxShadow: 3, backgroundColor: "#fff" }}>
+        <Box
+          sx={{
+            padding: 3,
+            borderRadius: 2,
+            boxShadow: 3,
+            backgroundColor: "#fff",
+          }}
+        >
           {sections.length > 0 && (
             <>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Stack direction="row" spacing={1.5} sx={{ color: "#888", alignItems: "center" }}>
-                  <Typography variant="body2" fontWeight={600}>{sections.length} Sections</Typography>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
+                <Stack
+                  direction="row"
+                  spacing={1.5}
+                  sx={{ color: "#888", alignItems: "center" }}
+                >
+                  <Typography variant="body2" fontWeight={600}>
+                    {sections.length} Sections
+                  </Typography>
                   <Typography variant="body2">•</Typography>
                   <Typography variant="body2" fontWeight={600}>
-                    {sections.reduce((acc, s) => acc + (s.subLessons?.length || 0), 0)} Lessons
+                    {sections.reduce(
+                      (acc, s) => acc + (s.subLessons?.length || 0),
+                      0
+                    )}{" "}
+                    Lessons
                   </Typography>
                   <Typography variant="body2">•</Typography>
                   <Typography variant="body2" fontWeight={600}>
@@ -79,11 +102,19 @@ const CurriculumTab = ({ courseId, courseDuration }) => {
                   </Typography>
                 </Stack>
 
-                <Button size="small" onClick={toggleCollapseAll} sx={{
-                  textTransform: "none", fontSize: "0.95rem", color: "#efab00ff",
-                  "&:hover": { backgroundColor: "#efab00ff", color: "#fff" }
-                }}>
-                  {expanded.length === sections.length ? "Collapse All Sections" : "Expand All Sections"}
+                <Button
+                  size="small"
+                  onClick={toggleCollapseAll}
+                  sx={{
+                    textTransform: "none",
+                    fontSize: "0.95rem",
+                    color: "#efab00ff",
+                    "&:hover": { backgroundColor: "#efab00ff", color: "#fff" },
+                  }}
+                >
+                  {expanded.length === sections.length
+                    ? "Collapse All Sections"
+                    : "Expand All Sections"}
                 </Button>
               </Box>
 
@@ -100,45 +131,131 @@ const CurriculumTab = ({ courseId, courseDuration }) => {
                       key={index}
                       expanded={expanded.includes(panelId)}
                       onChange={handleChange(panelId)}
-                      sx={{ borderRadius: 2, boxShadow: 2, "&:before": { display: "none" }, bgcolor: "#f9f9f9" }}
+                      sx={{
+                        borderRadius: 2,
+                        "&:before": { display: "none" },
+                        bgcolor: "#f9f9f9",
+                        boxShadow: 1,
+                      }}
                     >
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Box display="flex" alignItems="center" sx={{ width: "100%", pr: 2 }}>
-                          <Typography variant="body1" fontWeight={600} sx={{ flexGrow: 1, color: "#efab00ff" }}>
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          sx={{ width: "100%", pr: 2 }}
+                        >
+                          <Typography
+                            variant="body1"
+                            fontWeight={600}
+                            sx={{ flexGrow: 1, color: "#efab00ff" }}
+                          >
                             {section.title}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">{section.subLessons?.length || 0} Lessons</Typography>
-                          {totalDuration > 0 && <Typography variant="body2" color="text.secondary" ml={1}>· {formatDuration(totalDuration)}</Typography>}
+                          <Typography variant="body2" color="text.secondary">
+                            {section.subLessons?.length || 0} Lessons
+                          </Typography>
+                          {totalDuration > 0 && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              ml={1}
+                            >
+                              · {formatDuration(totalDuration)}
+                            </Typography>
+                          )}
                         </Box>
                       </AccordionSummary>
 
-                      <AccordionDetails>
-                        <Divider sx={{ my: 1 }} />
-                        <Stack spacing={1}>
+                      <AccordionDetails sx={{ p: 0 }}>
+                        <Stack spacing={0}>
                           {section.subLessons.map((sub, idx) => (
                             <Box
                               key={sub._id || idx}
                               onClick={() => setActiveSubLesson(sub._id)}
                               sx={{
-                                p: 1.5, display: "flex", alignItems: "center",
-                                justifyContent: "space-between", borderRadius: 2,
+                                p: 1.5,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                borderBottom:
+                                  idx !== section.subLessons.length - 1
+                                    ? "1px solid #eee"
+                                    : "none",
                                 "&:hover": { bgcolor: "#f3f3f3" },
-                                color: activeSubLesson === sub._id ? "#efab00ff" : "inherit",
+                                color:
+                                  activeSubLesson === sub._id
+                                    ? "#efab00ff"
+                                    : "inherit",
                               }}
                             >
-                              <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
-                                {sub.type === "quiz" ? <QuizIcon sx={{ color: "#888" }} /> : <DescriptionIcon sx={{ color: "#888" }} />}
-                                <Typography variant="body2" sx={{ flexGrow: 1, wordBreak: "break-word" }}>{sub.title}</Typography>
+                              <Box
+                                display="flex"
+                                alignItems="center"
+                                gap={1}
+                                flexGrow={1}
+                              >
+                                {sub.type === "quiz" ? (
+                                  <QuizIcon sx={{ color: "#888" }} />
+                                ) : (
+                                  <DescriptionIcon sx={{ color: "#888" }} />
+                                )}
+                                <Typography
+                                  variant="body2"
+                                  sx={{ flexGrow: 1, wordBreak: "break-word" }}
+                                >
+                                  {sub.title}
+                                </Typography>
                               </Box>
-                              <Box display="flex" alignItems="center" gap={1} sx={{ flexShrink: 0, minWidth: 140, justifyContent: "flex-end" }}>
-                                <Button size="small" variant="contained" sx={{
-                                  minWidth: 70, bgcolor: "#007bff", color: "white",
-                                  "&:hover": { bgcolor: "#0056b3" }, textTransform: "none"
-                                }}>Preview</Button>
-                                <Typography variant="caption" color="text.secondary">{sub.duration ? `${sub.duration} mins` : "0 min"}</Typography>
-                                {sub.isCompleted ? <CheckIcon fontSize="small" color="success" /> :
-                                  sub.isLocked ? <LockIcon fontSize="small" color="action" /> :
-                                    <VisibilityIcon fontSize="small" sx={{ color: "gray" }} />}
+
+                              <Box
+                                display="flex"
+                                alignItems="center"
+                                gap={1}
+                                sx={{
+                                  flexShrink: 0,
+                                  minWidth: 140,
+                                  justifyContent: "flex-end",
+                                }}
+                              >
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  sx={{
+                                    minWidth: 70,
+                                    bgcolor: "#007bff",
+                                    color: "#fff",
+                                    "&:hover": { bgcolor: "#0056b3" },
+                                    textTransform: "none",
+                                  }}
+                                >
+                                  Preview
+                                </Button>
+
+                                {/* Fix chiều rộng ô thời lượng */}
+                                <Box
+                                  sx={{
+                                    width: 70,
+                                    textAlign: "right",
+                                  }}
+                                >
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {formatDuration(sub.duration)}
+                                  </Typography>
+                                </Box>
+
+                                {sub.isCompleted ? (
+                                  <CheckIcon fontSize="small" color="success" />
+                                ) : sub.isLocked ? (
+                                  <LockIcon fontSize="small" color="action" />
+                                ) : (
+                                  <VisibilityIcon
+                                    fontSize="small"
+                                    sx={{ color: "gray" }}
+                                  />
+                                )}
                               </Box>
                             </Box>
                           ))}
@@ -151,7 +268,9 @@ const CurriculumTab = ({ courseId, courseDuration }) => {
             </>
           )}
 
-          <Box mt={3}><LeaveComment /></Box>
+          <Box mt={3}>
+            <LeaveComment />
+          </Box>
         </Box>
       </Box>
     </Fade>

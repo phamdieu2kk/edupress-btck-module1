@@ -13,7 +13,7 @@ const courseRoutes = require("./routes/courses.routes");
 const blogRoutes = require("./routes/blog.routes");
 const lessonRoutes = require("./routes/lessons.routes");
 const instructorRoutes = require("./routes/instructors.routes");
-
+const cartRoutes = require("./routes/cartRoutes");
 const app = express();
 
 // ===== Middlewares =====
@@ -46,8 +46,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/lessons", lessonRoutes);
 app.use("/api/instructors", instructorRoutes);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use("/api/cart", cartRoutes);
 // ===== Connect Database & Start Server =====
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/edupress";
 const PORT = process.env.PORT || 5000;
