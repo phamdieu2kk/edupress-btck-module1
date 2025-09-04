@@ -611,8 +611,9 @@ const CourseCard = ({ course, variant = "grid" }) => {
                   variant="outlined"
                   sx={{
                     textTransform: "none",
-                    fontWeight: 600,
-                    border:"none"
+                    fontWeight: 700,
+                    border:"none",
+                    color:"black",
                   }}
                 >
                   View More

@@ -515,7 +515,7 @@ import { useCart } from "../context/CartContext";
 import CartItems from "../components/CartItem";
 import CartSummary from "../components/CartSummary";
 import Footer from "./Footer";
-
+import PaymentPage from "./PaymentPage";
 const CartCourses = () => {
   const { cart, setCart } = useCart();
   const [loading, setLoading] = useState(true);

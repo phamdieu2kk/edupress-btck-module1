@@ -6,15 +6,18 @@ import Layout from "./components/Layout";
 // Pages
 import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
-
 import CourseDetail from "./pages/courses/CourseDetail";
-// import LessonManagement from "./pages/lessons/LessonManagement";
 import Lessons from "./pages/Lessons";
 import LessonCreateEdit from "./pages/lessons/LessonCreateEdit";
 import RevenueReport from "./pages/reports/RevenueReport";
 import RevenueDetail from "./pages/reports/RevenueDetail";
 import ReviewManagement from "./pages/reviews/ReviewManagement";
 import CourseCreate from "./pages/courses/CourseCreate";
+
+// Blog Pages
+import Blogs from "./pages/Blogs";
+import BlogCreateEdit from "./pages/BlogCreateEdit";
+
 function App() {
   return (
     <Routes>
@@ -27,29 +30,25 @@ function App() {
         {/* Courses */}
         <Route path="courses" element={<Courses />} />
         <Route path="courses-create" element={<CourseCreate />} />
-        {/* <Route path="courses/:id/edit" element={<CourseCreateEdit />} /> */}
         <Route path="courses/:id" element={<CourseDetail />} />
-
-
-
-
-
 
         {/* Lessons */}
         <Route path="lessons" element={<Lessons />} />
-  
-{/* <Route path="/admin/lessons/create/:courseId" element={<LessonCreateEdit />} />
-<Route path="/admin/lessons/edit/:lessonId/:courseId" element={<LessonCreateEdit />} /> */}
- {/* Danh sách lesson theo course */}
-        <Route path="/admin/lessons/:courseId" element={<Lessons />} />
-
+        {/* Danh sách lesson theo course */}
+        <Route path="lessons/:courseId" element={<Lessons />} />
         {/* Tạo mới lesson trong course */}
-        <Route path="/admin/lessons/create/:courseId" element={<LessonCreateEdit />} />
-
+        <Route path="lessons/create/:courseId" element={<LessonCreateEdit />} />
         {/* Chỉnh sửa lesson */}
-        <Route path="/admin/lessons/edit/:id/:courseId" element={<LessonCreateEdit />} />
+        <Route path="lessons/edit/:id/:courseId" element={<LessonCreateEdit />} />
+
+        {/* Reports */}
         <Route path="reports" element={<RevenueReport />} />
         <Route path="reports/:id" element={<RevenueDetail />} />
+
+        {/* Blog */}
+        <Route path="blog" element={<Blogs />} />
+        <Route path="blogs/create" element={<BlogCreateEdit />} />
+        <Route path="blogs/edit/:id" element={<BlogCreateEdit />} />
 
         {/* Reviews */}
         <Route path="reviews" element={<ReviewManagement />} />

@@ -15,6 +15,10 @@ import Faqs from "./pages/Faqs";
 import Error from "./pages/Error";
 import Profile from "./pages/Profile";
 import CartCourses from "./pages/CartCourses";
+import PaymentPage from "./pages/PaymentPage";
+import Order from "./components/payment/Order";
+import Payment from "./components/payment/Payment";
+
 
 function App() {
   return (
@@ -40,6 +44,14 @@ function App() {
         <Route path="/faqs" element={<Faqs />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/cart-courses" element={<CartCourses />} />
+
+         <Route path="/paymentpage" element={<PaymentPage />} />
+{/* <Route path="/order" element={<PaymentPage />} /> */}
+
+
+<Route path="/order" element={<Order />} />
+        <Route path="/payment" element={<Payment />} />
+
 
         {/* 404 */}
         <Route path="*" element={<Error />} />

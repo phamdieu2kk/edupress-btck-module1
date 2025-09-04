@@ -4,138 +4,192 @@ import {
   TextField,
   Button,
   Typography,
-  Container,
-  Snackbar,
   Alert,
+  CircularProgress,
+  Container,
   Paper,
-  Link,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Footer from "../pages/Footer";
-import Breadcrumbs from "../components/Breadcrumbs";
 import axios from "axios";
 
-const ForgotPassword = () => {
+const ForgotPasswordOtp = () => {
+  const [step, setStep] = useState(1); // 1 = send OTP, 2 = enter OTP + new password
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  // Step 1: Send OTP
+  const handleSendOtp = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setMessage("");
+    setError("");
 
     try {
-      const response = await axios.post("/api/auth/forgot-password", { email });
-      setSnackbarMessage(response.data.message); // Show the success message from the backend
-      setOpenSnackbar(true);
-      setEmail(""); // Reset email input
+      const res = await axios.post("http://localhost:5000/api/auth/send-otp", {
+        email,
+      });
+      setMessage(res.data.message);
+      setStep(2);
     } catch (err) {
-      setSnackbarMessage(err.response?.data?.message || "An error occurred");
-      setOpenSnackbar(true);
+      console.error(err);
+      setError(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
+  // Step 2: Reset password with OTP
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/reset-password-otp",
+        { email, otp, newPassword }
+      );
+      setMessage(res.data.message);
+
+      // Reset fields
+      setStep(1);
+      setOtp("");
+      setNewPassword("");
+
+      // Redirect to login after short delay
+      setTimeout(() => {
+        navigate("/auth");
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <>
-      <Breadcrumbs paths={[{ name: "Home", href: "/" }, { name: "Forgot Password" }]} />
-      
-      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: "#f9f9f9" }}>
-        <Container maxWidth="lg">
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <Paper
-              elevation={5}
+    <Container maxWidth="sm" sx={{ mt: 10 }}>
+      <Paper
+        elevation={6}
+        sx={{
+          p: 4,
+          borderRadius: 3,
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          sx={{ mb: 1, color: "#f36602" }}
+        >
+          Forgot Password
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 3, color: "text.secondary" }}>
+          {step === 1
+            ? "Enter your email to receive an OTP to reset your password."
+            : "Enter the OTP and your new password."}
+        </Typography>
+
+        <Divider sx={{ mb: 3 }} />
+
+        {message && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+        )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {step === 1 && (
+          <Box
+            component="form"
+            onSubmit={handleSendOtp}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <TextField
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              fullWidth
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              disabled={loading}
               sx={{
-                p: 3,
-                borderRadius: 3,
-                boxShadow: 3,
-                backgroundColor: "#fff",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "100%",
-                maxWidth: 400,
+                py: 1.3,
+                backgroundColor: "#f36602",
+                textTransform: "none",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "#e05c00" },
               }}
             >
-              <Typography variant="h4" mb={2} sx={{ fontWeight: "bold" }}>
-                Forgot Password
-              </Typography>
-
-              <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-                <TextField
-                  label="Email"
-                  type="email"
-                  fullWidth
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  sx={{ mb: 2 }}
-                  InputLabelProps={{
-                    style: { color: "#f36602" },
-                  }}
-                  variant="outlined"
-                />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    py: 1.2,
-                    backgroundColor: "#f36602",
-                    "&:hover": {
-                      backgroundColor: "#f26e0f",
-                    },
-                    textTransform: "none",
-                  }}
-                  disabled={loading}
-                >
-                  {loading ? "Sending..." : "Send Instructions"}
-                </Button>
-              </form>
-
-              <Box sx={{ mt: 3, width: "100%", display: "flex", justifyContent: "flex-end" }}>
-                <Typography variant="body2">
-                  <Link
-                    onClick={() => navigate("/auth")}
-                    sx={{
-                      textTransform: "none",
-                      fontSize: "0.9rem",
-                      color: "#f36602",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Back to Login
-                  </Link>
-                </Typography>
-              </Box>
-            </Paper>
+              {loading ? <CircularProgress size={24} /> : "Send OTP"}
+            </Button>
           </Box>
-        </Container>
-      </Box>
+        )}
 
-      {/* Snackbar for success or error message */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        sx={{ top: { xs: "100px", md: "100px" }, right: { xs: "100px", md: "100px" } }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarMessage.includes("error") ? "error" : "success"} sx={{ bgcolor: "#3eea05", color: "#ffffff" }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+        {step === 2 && (
+          <Box
+            component="form"
+            onSubmit={handleResetPassword}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <TextField
+              label="OTP Code"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+              fullWidth
+            />
+            <TextField
+              label="New Password"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              fullWidth
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              disabled={loading}
+              sx={{
+                py: 1.3,
+                backgroundColor: "#f36602",
+                textTransform: "none",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "#e05c00" },
+              }}
+            >
+              {loading ? <CircularProgress size={24} /> : "Reset Password"}
+            </Button>
+          </Box>
+        )}
 
-      <Footer />
-    </>
+        <Typography mt={3} variant="caption" color="text.secondary">
+          OTP will expire after <strong>5 minutes</strong>. Please check your
+          email.
+        </Typography>
+      </Paper>
+    </Container>
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordOtp;

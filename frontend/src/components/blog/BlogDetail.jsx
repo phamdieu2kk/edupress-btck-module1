@@ -1,3 +1,4 @@
+// src/components/blog/BlogDetail.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -10,6 +11,7 @@ import {
   useMediaQuery,
   useTheme,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -25,6 +27,8 @@ import LeaveComment from "../courses/CourseDetailTabs/LeaveComment";
 import CommentSection from "./CommentSection";
 import Footer from "../../pages/Footer";
 
+const BASE_URL = "http://localhost:5000/api/blogs";
+
 const BlogDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -36,18 +40,18 @@ const BlogDetail = () => {
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Fetch bài hiện tại theo _id
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const resAll = await axios.get("http://localhost:5000/api/blogs");
-        setBlogPosts(resAll.data.blogs || resAll.data);
+        const resAll = await axios.get(BASE_URL);
+        const allPosts = resAll.data.blogs || resAll.data;
+        setBlogPosts(allPosts);
 
-        const resPost = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+        const resPost = await axios.get(`${BASE_URL}/${id}`);
         setPost(resPost.data);
       } catch (err) {
-        console.error("Lỗi fetch bài viết:", err);
+        console.error("❌ Lỗi fetch bài viết:", err);
         setPost(null);
       } finally {
         setLoading(false);
@@ -59,7 +63,9 @@ const BlogDetail = () => {
   if (loading) {
     return (
       <Container sx={{ py: 10 }}>
-        <Typography>Loading...</Typography>
+        <Box display="flex" justifyContent="center">
+          <CircularProgress />
+        </Box>
       </Container>
     );
   }
@@ -74,16 +80,20 @@ const BlogDetail = () => {
     );
   }
 
+  // Prev / Next
   const postIndex = blogPosts.findIndex((p) => p._id === post._id);
   const prevPost = postIndex > 0 ? blogPosts[postIndex - 1] : null;
   const nextPost =
     postIndex < blogPosts.length - 1 ? blogPosts[postIndex + 1] : null;
 
-  const handlePrev = () => {
-    if (prevPost) navigate(`/blog/${prevPost._id}`);
-  };
-  const handleNext = () => {
-    if (nextPost) navigate(`/blog/${nextPost._id}`);
+  const handlePrev = () => prevPost && navigate(`/blog/${prevPost._id}`);
+  const handleNext = () => nextPost && navigate(`/blog/${nextPost._id}`);
+
+  // Format date giống BlogCard
+  const formatDate = (d) => {
+    const dateObj = d ? new Date(d) : new Date();
+    if (isNaN(dateObj)) return "Không có ngày";
+    return dateObj.toLocaleDateString("vi-VN");
   };
 
   return (
@@ -92,7 +102,7 @@ const BlogDetail = () => {
         paths={[
           { name: "Home", href: "/" },
           { name: "Blog", href: "/blog" },
-          { name: post?.title || "Chi tiết bài viết" },
+          { name: post.title || "Chi tiết bài viết" },
         ]}
       />
 
@@ -109,6 +119,7 @@ const BlogDetail = () => {
           )}
 
           <Stack direction={{ xs: "column", lg: "row" }} spacing={4}>
+            {/* Main content */}
             <Box flex={1}>
               <Typography variant="h4" fontWeight="bold" gutterBottom>
                 {post.title}
@@ -116,32 +127,46 @@ const BlogDetail = () => {
 
               {/* Meta */}
               <Stack direction="row" spacing={3} alignItems="center" color="text.secondary" sx={{ mb: 2 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <PersonIcon fontSize="small" />
-                  <Typography variant="body2">{post.author}</Typography>
-                </Stack>
-                <Stack direction="row" alignItems="center" spacing={1}>
+                {post.author && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <PersonIcon fontSize="small" />
+                    <Typography variant="body2">{post.author}</Typography>
+                  </Stack>
+                )}
+                <Stack direction="row" spacing={1} alignItems="center">
                   <CalendarTodayIcon fontSize="small" />
-                  <Typography variant="body2">
-                    {new Date(post.createdAt).toLocaleDateString()}
-                  </Typography>
+                  <Typography variant="body2">{formatDate(post.date)}</Typography>
                 </Stack>
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" spacing={1} alignItems="center">
                   <CommentIcon fontSize="small" />
                   <Typography variant="body2">{post.comments?.length || 0} Comments</Typography>
                 </Stack>
               </Stack>
 
-              {/* Content */}
-              <Typography variant="body1" sx={{ mb: 3, color: "text.secondary", lineHeight: 1.8 }}>
-                {post.description || "Không có mô tả."}
-              </Typography>
+              {/* Image */}
               {post.image && (
-                <Box component="img" src={post.image} alt={post.title} sx={{ width: "100%", height: "auto", borderRadius: 2, mb: 3 }} />
+                <Box
+                  component="img"
+                  src={post.image}
+                  alt={post.title}
+                  sx={{ width: "100%", height: "auto", borderRadius: 2, mb: 3 }}
+                />
               )}
+
+              {/* Description */}
+              {post.description && (
+                <Typography
+                  variant="body1"
+                  sx={{ mb: 3, color: "text.secondary", lineHeight: 1.8 }}
+                >
+                  {post.description}
+                </Typography>
+              )}
+
+              {/* Content */}
               <Stack spacing={3}>
-                {(post.content || "").split("\n").map((para, index) => (
-                  <Typography key={index} variant="body1" sx={{ lineHeight: 1.8 }}>
+                {(post.content || "").split("\n").map((para, idx) => (
+                  <Typography key={idx} variant="body1" sx={{ lineHeight: 1.8 }}>
                     {para}
                   </Typography>
                 ))}
@@ -151,14 +176,38 @@ const BlogDetail = () => {
               <Stack direction="row" justifyContent="space-between" mt={6} spacing={2}>
                 <Box textAlign="left" width="50%">
                   {prevPost && (
-                    <Button onClick={handlePrev} startIcon={<ArrowBackIcon />} fullWidth sx={{ textTransform: "none", border: "1px solid #ccc", borderRadius: 2, padding: "10px 16px", bgcolor: "#fff", "&:hover": { bgcolor: "#f5f5f5", borderColor: "#999" } }}>
+                    <Button
+                      onClick={handlePrev}
+                      startIcon={<ArrowBackIcon />}
+                      fullWidth
+                      sx={{
+                        textTransform: "none",
+                        border: "1px solid #ccc",
+                        borderRadius: 2,
+                        padding: "10px 16px",
+                        bgcolor: "#fff",
+                        "&:hover": { bgcolor: "#f5f5f5", borderColor: "#999" },
+                      }}
+                    >
                       {prevPost.title}
                     </Button>
                   )}
                 </Box>
                 <Box textAlign="right" width="50%">
                   {nextPost && (
-                    <Button onClick={handleNext} endIcon={<ArrowForwardIcon />} fullWidth sx={{ textTransform: "none", border: "1px solid #ccc", borderRadius: 2, padding: "10px 16px", bgcolor: "#fff", "&:hover": { bgcolor: "#f5f5f5", borderColor: "#999" } }}>
+                    <Button
+                      onClick={handleNext}
+                      endIcon={<ArrowForwardIcon />}
+                      fullWidth
+                      sx={{
+                        textTransform: "none",
+                        border: "1px solid #ccc",
+                        borderRadius: 2,
+                        padding: "10px 16px",
+                        bgcolor: "#fff",
+                        "&:hover": { bgcolor: "#f5f5f5", borderColor: "#999" },
+                      }}
+                    >
                       {nextPost.title}
                     </Button>
                   )}
@@ -167,8 +216,8 @@ const BlogDetail = () => {
 
               {/* Comments */}
               <Box sx={{ mt: 6 }}>
-                <CommentSection />
-                <LeaveComment />
+                <CommentSection postId={post._id} />
+                <LeaveComment postId={post._id} />
               </Box>
             </Box>
 
@@ -195,4 +244,3 @@ const BlogDetail = () => {
 };
 
 export default BlogDetail;
- 

@@ -23,13 +23,16 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ArticleIcon from "@mui/icons-material/Article"; // <-- icon cho Blog
 
 const drawerWidth = 200;
 
 const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
   { text: "Courses", icon: <ClassIcon />, path: "/admin/courses" },
+  { text: "Blog", icon: <ArticleIcon />, path: "/admin/blog" }, // <-- thêm menu Blog
   // { text: "Lessons", icon: <MenuBookIcon />, path: "/admin/lessons" },
+
   { text: "Reports", icon: <BarChartIcon />, path: "/admin/reports" },
   { text: "Reviews", icon: <ReviewsIcon />, path: "/admin/reviews" },
 ];
@@ -119,7 +122,10 @@ const Sidebar = () => {
   );
 
   return (
-    <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
+    <Box
+      component="nav"
+      sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+    >
       {/* Mobile menu icon */}
       {isMobile && (
         <IconButton

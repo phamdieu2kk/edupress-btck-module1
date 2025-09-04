@@ -9,7 +9,9 @@ const blogSchema = new mongoose.Schema(
     image: { type: String },
     author: { type: String, default: "Admin" },
     date: { type: Date, default: Date.now },
-    tags: [String]
+    tags: [String],
+     category: [{ type: String }], // array of strings
+
   },
   { timestamps: true }
 );

@@ -6,8 +6,11 @@ import {
   Divider,
   Button,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const CartSummary = ({ totalSelectedItems, totalPrice, formatCurrency, isAnyItemSelected }) => {
+  const navigate = useNavigate();
+
   return (
     <Box
       flex={1}
@@ -52,6 +55,7 @@ const CartSummary = ({ totalSelectedItems, totalPrice, formatCurrency, isAnyItem
         fullWidth
         variant="contained"
         disabled={!isAnyItemSelected}
+        onClick={() => navigate("/order")}   // 👉 Điều hướng qua /payment
         sx={{
           bgcolor: isAnyItemSelected ? "#e67e22" : "#e0e0e0",
           "&:hover": {

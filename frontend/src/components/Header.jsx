@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import React, { useState } from "react";
 import { Button, Menu, MenuItem } from "@mui/material";
 import { ArrowDropDown as ArrowDropDownIcon } from "@mui/icons-material";
@@ -10,6 +9,7 @@ function Header({ navLinkStyle, pageLinks }) {
 
   const handleOpen = (setter) => (event) => setter(event.currentTarget);
   const handleClose = (setter) => () => setter(null);
+
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(path + "/");
 
@@ -18,20 +18,13 @@ function Header({ navLinkStyle, pageLinks }) {
       <Button component={Link} to="/" sx={navLinkStyle(isActive("/"))}>
         Home
       </Button>
-      <Button
-        component={Link}
-        to="/courses"
-        sx={navLinkStyle(isActive("/courses"))}
-      >
+      <Button component={Link} to="/courses" sx={navLinkStyle(isActive("/courses"))}>
         Courses
       </Button>
-      <Button
-        component={Link}
-        to="/blog"
-        sx={navLinkStyle(isActive("/blog"))}
-      >
+      <Button component={Link} to="/blog" sx={navLinkStyle(isActive("/blog"))}>
         Blog
       </Button>
+
       <Button
         onClick={handleOpen(setAnchorElPage)}
         endIcon={<ArrowDropDownIcon />}
@@ -55,11 +48,8 @@ function Header({ navLinkStyle, pageLinks }) {
           </MenuItem>
         ))}
       </Menu>
-      <Button
-        component={Link}
-        to="/premium-themes"
-        sx={navLinkStyle(isActive("/premium-themes"))}
-      >
+
+      <Button component={Link} to="/premium-themes" sx={navLinkStyle(isActive("/premium-themes"))}>
         Premium Theme
       </Button>
     </>
