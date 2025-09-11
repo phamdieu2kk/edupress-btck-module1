@@ -284,6 +284,7 @@
 
 
 
+// src/components/CourseCard.jsx
 import React, { useState } from "react";
 import {
   Card,
@@ -304,42 +305,39 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import PeopleIcon from "@mui/icons-material/People";
-// import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Link } from "react-router-dom";
 import useCourseLessons from "../../hook/useCourseLessons";
-import { useCart } from "../../context/CartContext"; // ✅ import cart context
+import { useCart } from "../../context/CartContext";
 import axios from "axios";
-
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import { formatCurrencyDisplay } from "../../utils/helpers"; // ✅ Import helper function
 
 const CourseCard = ({ course, variant = "grid" }) => {
   const isList = variant === "list";
   const cardLink = `/courses/${course._id}`;
-  const { cart, setCart } = useCart(); // ✅ lấy context cart
+  const { cart, setCart } = useCart();
   const [openSnack, setOpenSnack] = useState(false);
   const [snackMsg, setSnackMsg] = useState("");
   const [loadingAdd, setLoadingAdd] = useState(false);
 
-  // Hook lấy sections để tính tổng lessons
+  // Lessons count
   const { sections, loading } = useCourseLessons(course._id);
   const totalLessons = sections.reduce(
     (total, s) => total + (s.subLessons?.length || 0),
     0
   );
 
-  // === Hàm thêm vào giỏ hàng trực tiếp ===
+  // === Add to Cart ===
   const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      setSnackMsg("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      setSnackMsg("Please login to add to cart");
       setOpenSnack(true);
       return;
     }
 
     setLoadingAdd(true);
     try {
-      // Optimistic UI: cập nhật trực tiếp context cart
       const existingItem = cart.find((item) => item.course._id === course._id);
       if (existingItem) {
         setCart((prev) =>
@@ -353,31 +351,30 @@ const CourseCard = ({ course, variant = "grid" }) => {
         setCart((prev) => [...prev, { course, quantity: 1 }]);
       }
 
-      // Gửi request thực sự lên server
       await axios.post(
         "http://localhost:5000/api/cart",
         { courseId: course._id, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setSnackMsg("Thêm vào giỏ hàng thành công!");
+      setSnackMsg("Added to cart successfully!");
       setOpenSnack(true);
     } catch (err) {
       console.error(err);
-      setSnackMsg(err.response?.data?.message || "Lỗi khi thêm vào giỏ hàng");
+      setSnackMsg(err.response?.data?.message || "Error while adding to cart");
       setOpenSnack(true);
     } finally {
       setLoadingAdd(false);
     }
   };
 
-  // === Render icons info ===
+  // === Render list view info ===
   const renderListInfoIcons = () => (
     <Stack direction="row" spacing={1.5} flexWrap="wrap" mb={1}>
       <Stack direction="row" spacing={0.5} alignItems="center">
         <AccessTimeIcon fontSize="small" sx={{ color: "warning.main" }} />
         <Typography variant="caption" color="text.primary">
-          {course.duration ? `${course.duration} Weeks` : "2 Weeks"}
+          {course.duration ? `${course.duration} Weeks` : "0 Weeks"}
         </Typography>
       </Stack>
       <Stack direction="row" spacing={0.5} alignItems="center">
@@ -401,6 +398,7 @@ const CourseCard = ({ course, variant = "grid" }) => {
     </Stack>
   );
 
+  // === Render grid view info ===
   const renderGridInfoIcons = () => (
     <Stack direction="row" spacing={1.5} flexWrap="wrap" mb={1} mt={1}>
       <Stack direction="row" spacing={0.5} alignItems="center">
@@ -516,7 +514,7 @@ const CourseCard = ({ course, variant = "grid" }) => {
                 gap: 1,
               }}
             >
-              {/* Giá */}
+              {/* === Price === */}
               <Box sx={{ flexGrow: 1 }}>
                 <Stack direction="row" spacing={1} alignItems="baseline">
                   {course.originalPrice &&
@@ -538,13 +536,13 @@ const CourseCard = ({ course, variant = "grid" }) => {
                             mr: 1,
                           }}
                         >
-                          ${course.originalPrice.toLocaleString()}
+                          {formatCurrencyDisplay(course.originalPrice)}
                         </Typography>
                         <Typography
                           variant="h6"
                           sx={{ fontWeight: 700, color: "error.main" }}
                         >
-                          ${course.price.toLocaleString()}
+                          {formatCurrencyDisplay(course.price)}
                         </Typography>
                       </>
                     )
@@ -560,50 +558,31 @@ const CourseCard = ({ course, variant = "grid" }) => {
                       variant="h6"
                       sx={{ fontWeight: 700, color: "text.secondary" }}
                     >
-                      ${course.price.toLocaleString()}
+                      {formatCurrencyDisplay(course.price)}
                     </Typography>
                   )}
                 </Stack>
               </Box>
 
-              {/* Actions */}
+              {/* === Actions === */}
               <Stack direction="row" spacing={1} alignItems="center">
-                {/* Add to Cart */}
-                {/* <IconButton
-  onClick={handleAddToCart}
-  disabled={loadingAdd}
-  sx={{
-    color: "#FF6B00",
-    "&:hover": { color: "#e55d00", bgcolor: "rgba(255,107,0,0.1)" },
-  }}
->
-  <ShoppingCartIcon fontSize="small" />
-</IconButton> */}
+                <IconButton
+                  onClick={handleAddToCart}
+                  disabled={loadingAdd}
+                  sx={{
+                    color: "#FF6B00",
+                    borderRadius: 0,
+                    transition: "0.2s",
+                    "&:hover": {
+                      bgcolor: "#FFE8D6",
+                      color: "#e55d00",
+                      borderRadius: 0,
+                    },
+                  }}
+                >
+                  <ShoppingCartOutlinedIcon fontSize="small" />
+                </IconButton>
 
-
-
-
-<IconButton
-  onClick={handleAddToCart}
-  disabled={loadingAdd}
-  sx={{
-    color: "#FF6B00",
-    borderRadius: 0, // vuông
-    transition: "0.2s",
-    "&:hover": {
-      bgcolor: "#FFE8D6", // màu nền khi hover
-      color: "#e55d00",   // màu icon khi hover
-      borderRadius: 0,    // giữ vuông khi hover
-    },
-  }}
->
-  <ShoppingCartOutlinedIcon fontSize="small" />
-</IconButton>
-
-
-
-
-                {/* View More */}
                 <Button
                   component={Link}
                   to={cardLink}
@@ -612,8 +591,8 @@ const CourseCard = ({ course, variant = "grid" }) => {
                   sx={{
                     textTransform: "none",
                     fontWeight: 700,
-                    border:"none",
-                    color:"black",
+                    border: "none",
+                    color: "black",
                   }}
                 >
                   View More
@@ -624,7 +603,7 @@ const CourseCard = ({ course, variant = "grid" }) => {
         </CardContent>
       </Card>
 
-      {/* Snackbar thông báo */}
+      {/* Snackbar */}
       <Snackbar
         open={openSnack}
         autoHideDuration={3000}

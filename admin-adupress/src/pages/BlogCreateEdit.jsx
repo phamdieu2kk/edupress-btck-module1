@@ -75,17 +75,16 @@ const BlogCreateEdit = () => {
   const handleSubmit = async () => {
     setSaving(true);
     try {
-     const payload = {
-  title: blog.title,
-  excerpt: blog.excerpt,
-  content: blog.content,
-  image: blog.image,
-  author: blog.author,
-  tags: blog.tags.split(",").map(t => t.trim()),
-  date: blog.date,
-  categories: selectedCategoryIds // từ FE
-};
-
+      const payload = {
+        title: blog.title,
+        excerpt: blog.excerpt,
+        content: blog.content,
+        image: blog.image,
+        author: blog.author,
+        tags: blog.tags.split(",").map(t => t.trim()),
+        date: blog.date,
+        category: blog.category,
+      };
 
       if (id) {
         await axios.put(`${BASE_URL}/${id}`, payload);

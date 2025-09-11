@@ -127,7 +127,140 @@
 
 
 
-// src/context/CartContext.jsx
+// // src/context/CartContext.jsx
+// import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+// import axios from "axios";
+
+// const CartContext = createContext();
+
+// export const CartProvider = ({ children }) => {
+//   const token = localStorage.getItem("token");
+//   const [cart, setCart] = useState([]);
+//   const [orderId, setOrderId] = useState(null);
+
+//   // Lưu timeout debounce cho mỗi item
+//   const timeoutRefs = useRef({});
+
+//   // --- Fetch cart từ server ---
+//   const fetchCart = async () => {
+//     if (!token) return setCart([]);
+//     try {
+//       const res = await axios.get("http://localhost:5000/api/cart", {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//       setCart(res.data.items || []);
+//     } catch (err) {
+//       console.error(err);
+//       setCart([]);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchCart();
+//   }, [token]);
+
+//   // --- Thêm vào cart ---
+//   const addToCart = async (course, quantity = 1) => {
+//     if (!token) return;
+//     try {
+//       const res = await axios.post(
+//         "http://localhost:5000/api/cart",
+//         { courseId: course._id, quantity },
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       setCart(res.data.items || []);
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   // --- Cập nhật số lượng cart (gọi API ngay) ---
+//   const updateCartItem = async (courseId, quantity) => {
+//     if (!token) return;
+//     try {
+//       await axios.put(
+//         "http://localhost:5000/api/cart",
+//         { courseId, quantity },
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       setCart((prev) =>
+//         prev.map((item) =>
+//           item.course._id === courseId ? { ...item, quantity } : item
+//         )
+//       );
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   // --- Cập nhật số lượng cart local trước, debounce 1s mới gọi API ---
+//   const updateCartItemLocalDebounced = (courseId, quantity) => {
+//     setCart((prev) =>
+//       prev.map((item) =>
+//         item.course._id === courseId ? { ...item, quantity } : item
+//       )
+//     );
+
+//     if (timeoutRefs.current[courseId]) clearTimeout(timeoutRefs.current[courseId]);
+//     timeoutRefs.current[courseId] = setTimeout(() => {
+//       updateCartItem(courseId, quantity);
+//     }, 1000);
+//   };
+
+//   // --- Xóa item ---
+//   const removeFromCart = async (courseId) => {
+//     if (!token) return;
+//     setCart((prev) => prev.filter((item) => item.course._id !== courseId));
+//     try {
+//       await axios.delete(`http://localhost:5000/api/cart/${courseId}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//     } catch (err) {
+//       console.error(err);
+//       fetchCart(); // Đồng bộ lại nếu lỗi
+//     }
+//   };
+
+//   // --- Clear cart ---
+//   const clearCart = () => setCart([]);
+
+//   return (
+//     <CartContext.Provider
+//       value={{
+//         cart,
+//         setCart,
+//         orderId,
+//         setOrderId,
+//         addToCart,
+//         updateCartItem,
+//         updateCartItemLocalDebounced,
+//         removeFromCart,
+//         clearCart,
+//       }}
+//     >
+//       {children}
+//     </CartContext.Provider>
+//   );
+// };
+
+// export const useCart = () => {
+//   const context = useContext(CartContext);
+//   if (!context) throw new Error("useCart must be used within CartProvider");
+//   return context;
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 
@@ -137,11 +270,8 @@ export const CartProvider = ({ children }) => {
   const token = localStorage.getItem("token");
   const [cart, setCart] = useState([]);
   const [orderId, setOrderId] = useState(null);
-
-  // Lưu timeout debounce cho mỗi item
   const timeoutRefs = useRef({});
 
-  // --- Fetch cart từ server ---
   const fetchCart = async () => {
     if (!token) return setCart([]);
     try {
@@ -155,11 +285,8 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    fetchCart();
-  }, [token]);
+  useEffect(() => { fetchCart(); }, [token]);
 
-  // --- Thêm vào cart ---
   const addToCart = async (course, quantity = 1) => {
     if (!token) return;
     try {
@@ -169,12 +296,9 @@ export const CartProvider = ({ children }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCart(res.data.items || []);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
-  // --- Cập nhật số lượng cart (gọi API ngay) ---
   const updateCartItem = async (courseId, quantity) => {
     if (!token) return;
     try {
@@ -183,31 +307,16 @@ export const CartProvider = ({ children }) => {
         { courseId, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setCart((prev) =>
-        prev.map((item) =>
-          item.course._id === courseId ? { ...item, quantity } : item
-        )
-      );
-    } catch (err) {
-      console.error(err);
-    }
+      setCart((prev) => prev.map((item) => item.course._id === courseId ? { ...item, quantity } : item));
+    } catch (err) { console.error(err); }
   };
 
-  // --- Cập nhật số lượng cart local trước, debounce 1s mới gọi API ---
   const updateCartItemLocalDebounced = (courseId, quantity) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.course._id === courseId ? { ...item, quantity } : item
-      )
-    );
-
+    setCart((prev) => prev.map((item) => item.course._id === courseId ? { ...item, quantity } : item));
     if (timeoutRefs.current[courseId]) clearTimeout(timeoutRefs.current[courseId]);
-    timeoutRefs.current[courseId] = setTimeout(() => {
-      updateCartItem(courseId, quantity);
-    }, 1000);
+    timeoutRefs.current[courseId] = setTimeout(() => updateCartItem(courseId, quantity), 1000);
   };
 
-  // --- Xóa item ---
   const removeFromCart = async (courseId) => {
     if (!token) return;
     setCart((prev) => prev.filter((item) => item.course._id !== courseId));
@@ -217,27 +326,18 @@ export const CartProvider = ({ children }) => {
       });
     } catch (err) {
       console.error(err);
-      fetchCart(); // Đồng bộ lại nếu lỗi
+      fetchCart();
     }
   };
 
-  // --- Clear cart ---
   const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        setCart,
-        orderId,
-        setOrderId,
-        addToCart,
-        updateCartItem,
-        updateCartItemLocalDebounced,
-        removeFromCart,
-        clearCart,
-      }}
-    >
+    <CartContext.Provider value={{
+      cart, setCart, orderId, setOrderId,
+      addToCart, updateCartItem, updateCartItemLocalDebounced,
+      removeFromCart, clearCart
+    }}>
       {children}
     </CartContext.Provider>
   );
@@ -248,3 +348,4 @@ export const useCart = () => {
   if (!context) throw new Error("useCart must be used within CartProvider");
   return context;
 };
+

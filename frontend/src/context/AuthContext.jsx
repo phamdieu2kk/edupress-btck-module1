@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
       if (!item || item === "undefined" || item === "null") return null;
       return JSON.parse(item);
     } catch (error) {
-      console.error(`Error parsing localStorage key "${key}":`, error);
       return null;
     }
   };
@@ -18,19 +17,13 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
   }, [user]);
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token");
-    }
+    if (token) localStorage.setItem("token", token);
+    else localStorage.removeItem("token");
   }, [token]);
 
   const login = (userData, tokenValue) => {
@@ -41,14 +34,11 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
   };
 
   const register = (userData, tokenValue, navigate) => {
     setUser(userData);
     setToken(tokenValue);
-    // ✅ Sau khi đăng ký thành công → chuyển về login
     if (navigate) navigate("/login");
   };
 

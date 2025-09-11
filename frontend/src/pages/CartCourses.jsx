@@ -515,7 +515,9 @@ import { useCart } from "../context/CartContext";
 import CartItems from "../components/CartItem";
 import CartSummary from "../components/CartSummary";
 import Footer from "./Footer";
-import PaymentPage from "./PaymentPage";
+// import PaymentPage from "./PaymentPage"; // Không cần import ở đây
+import { formatCurrencyDisplay } from "../utils/helpers"; // ✅ Nhập hàm định dạng từ tệp tiện ích
+
 const CartCourses = () => {
   const { cart, setCart } = useCart();
   const [loading, setLoading] = useState(true);
@@ -562,7 +564,7 @@ const CartCourses = () => {
   }, [cart]);
 
   // Price helpers
-  const formatCurrency = (price) => `$${price.toLocaleString()}`;
+  // ✅ Xóa hàm formatCurrency cục bộ
   const totalSelectedItems = cart.filter((i) => i.checked).length;
   const totalPrice = cart
     .filter((i) => i.checked)
@@ -640,7 +642,7 @@ const CartCourses = () => {
                 // TODO: debounce update API
               }}
               totalPrice={totalPrice}
-              formatCurrency={formatCurrency}
+              formatCurrency={formatCurrencyDisplay} // ✅ Dùng hàm đã import
             />
           </Box>
 
@@ -649,7 +651,7 @@ const CartCourses = () => {
             <CartSummary
               totalSelectedItems={totalSelectedItems}
               totalPrice={totalPrice}
-              formatCurrency={formatCurrency}
+              formatCurrency={formatCurrencyDisplay} // ✅ Dùng hàm đã import
               isAnyItemSelected={isAnyItemSelected}
             />
           </Box>

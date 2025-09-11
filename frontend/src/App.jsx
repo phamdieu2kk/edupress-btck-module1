@@ -15,10 +15,10 @@ import Faqs from "./pages/Faqs";
 import Error from "./pages/Error";
 import Profile from "./pages/Profile";
 import CartCourses from "./pages/CartCourses";
-import PaymentPage from "./pages/PaymentPage";
+// import PaymentPage from "./pages/PaymentPage";
 import Order from "./components/payment/Order";
 import Payment from "./components/payment/Payment";
-
+import PaymentResult from "./pages/PaymentResult";
 
 function App() {
   return (
@@ -45,13 +45,14 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/cart-courses" element={<CartCourses />} />
 
-         <Route path="/paymentpage" element={<PaymentPage />} />
+         {/* <Route path="/paymentpage" element={<PaymentPage />} /> */}
 {/* <Route path="/order" element={<PaymentPage />} /> */}
 
 
 <Route path="/order" element={<Order />} />
         <Route path="/payment" element={<Payment />} />
 
+ <Route path="/payment-result" element={<PaymentResult />} />
 
         {/* 404 */}
         <Route path="*" element={<Error />} />
