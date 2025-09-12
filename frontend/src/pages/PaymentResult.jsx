@@ -1,66 +1,51 @@
-// src/pages/PaymentResult.jsx
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import axiosClient from "../api/axiosClient";
-import { Box, Typography, Alert, CircularProgress } from "@mui/material";
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
+import { useLocation, useNavigate } from "react-router-dom";
+import { Box, Typography, Button } from "@mui/material";
+import { formatCurrencyDisplay } from "../utils/helpers";
 
 const PaymentResult = () => {
-  const query = useQuery();
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [orderData, setOrderData] = useState(null);
 
   useEffect(() => {
-    const fetchResult = async () => {
-      const params = {};
-      for (let pair of query.entries()) params[pair[0]] = pair[1];
+    if (location.state && location.state.orderId && location.state.total != null) {
+      setOrderData({
+        orderId: location.state.orderId,
+        total: location.state.total,
+      });
+    } else {
+      // Vào trực tiếp URL -> không có state
+      setOrderData({
+        orderId: "EDP1874029520",
+        total: 0, // Hoặc giá trị mặc định bạn muốn
+      });
+    }
+  }, [location.state]);
 
-      try {
-        // Gọi API backend để kiểm tra kết quả thanh toán
-        const res = await axiosClient.get("/vnpay/check_payment", { params });
-        setResult(res.data);
-      } catch (err) {
-        console.error(err);
-        setError("Không thể xác thực kết quả thanh toán");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchResult();
-  }, [query]);
-
-  if (loading) return (
-    <Box mt={8} textAlign="center">
-      <CircularProgress />
-      <Typography mt={2}>Đang kiểm tra kết quả thanh toán...</Typography>
-    </Box>
-  );
-
-  if (error) return (
-    <Box mt={8} maxWidth={500} mx="auto">
-      <Alert severity="error">{error}</Alert>
-    </Box>
-  );
+  if (!orderData) return null;
 
   return (
-    <Box mt={8} maxWidth={500} mx="auto" p={3} border="1px solid #ddd" borderRadius={2}>
-      {result?.success ? (
-        <Alert severity="success">
-          Thanh toán thành công! <br />
-          Mã giao dịch: {result.data.vnp_TransactionNo || result.data.vnp_TxnRef} <br />
-          Số tiền: {result.data.vnp_Amount ? result.data.vnp_Amount / 100 : ""} VND
-        </Alert>
-      ) : (
-        <Alert severity="error">
-          Thanh toán thất bại! <br />
-          {result?.data?.vnp_ResponseCode && <>Mã lỗi: {result.data.vnp_ResponseCode} <br /></>}
-          {result?.message}
-        </Alert>
-      )}
+    <Box sx={{ maxWidth: 600, mx: "auto", mt: 12, textAlign: "center", px: 2 }}>
+      <Typography variant="h4" mb={3} color="green">
+        Thanh toán thành công!
+      </Typography>
+
+      <Typography variant="h6" mb={3}>
+        Mã đơn hàng: <strong>{orderData.orderId}</strong>
+      </Typography>
+
+      <Typography variant="h5" mb={4} color="error">
+        Tổng tiền: {formatCurrencyDisplay(orderData.total)}
+      </Typography>
+
+      <Button
+        variant="contained"
+        onClick={() => navigate("/")}
+        sx={{ minWidth: 160, fontWeight: 600 }}
+      >
+        Quay về trang chủ
+      </Button>
     </Box>
   );
 };

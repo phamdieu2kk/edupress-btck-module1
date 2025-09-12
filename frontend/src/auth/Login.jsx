@@ -26,26 +26,50 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successSnackbar, setSuccessSnackbar] = useState(false);
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setErrorMessage("");
-    try {
-      const res = await axiosClient.post("/auth/login", { email, password });
+  // const handleLogin = async () => {
+  //   setLoading(true);
+  //   setErrorMessage("");
+  //   try {
+  //     const res = await axiosClient.post("/auth/login", { email, password });
 
-      login(res.user, res.token);
+  //     login(res.user, res.token);
 
-      if (rememberMe) localStorage.setItem("rememberedUser", email);
-      else localStorage.removeItem("rememberedUser");
+  //     if (rememberMe) localStorage.setItem("rememberedUser", email);
+  //     else localStorage.removeItem("rememberedUser");
 
-      setSuccessSnackbar(true);
+  //     setSuccessSnackbar(true);
 
-      setTimeout(() => navigate("/"), 1500);
-    } catch (err) {
-      setErrorMessage(err.response?.data?.message || "Login failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     setTimeout(() => navigate("/"), 1500);
+  //   } catch (err) {
+  //     setErrorMessage(err.response?.data?.message || "Login failed.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+const handleLogin = async () => {
+  setLoading(true);
+  setErrorMessage("");
+  try {
+    const res = await axiosClient.post("/auth/login", { email, password });
+
+    // 🔥 Lấy đúng user và token từ response
+    const { user, token } = res.data;
+    login(user, token); // cập nhật AuthContext
+
+    if (rememberMe) localStorage.setItem("rememberedUser", email);
+    else localStorage.removeItem("rememberedUser");
+
+    setSuccessSnackbar(true);
+
+    setTimeout(() => navigate("/"), 1500);
+  } catch (err) {
+    setErrorMessage(err.response?.data?.message || "Login failed.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <>

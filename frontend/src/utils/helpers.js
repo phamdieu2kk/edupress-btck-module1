@@ -59,27 +59,46 @@
 // };
 
 
+// // src/utils/helpers.js
+// /**
+//  * Hiển thị tiền cho người dùng (có dấu . và ₫)
+//  * @param {number} amount - Giá trị USD
+//  * @returns {string} Ví dụ: "1.000.000₫"
+//  */
+// export const formatCurrencyDisplay = (amount) => {
+//   const USD_TO_VND = 5000;
+//   if (!amount || isNaN(amount) || amount === 0) return "0₫";
+//   const vndValue = amount * USD_TO_VND;
+//   return vndValue.toLocaleString("vi-VN") + "₫";
+// };
 
-/**
- * Hiển thị tiền cho người dùng (có dấu . và ₫)
- * @param {number} amount - Giá trị USD
- * @returns {string} Ví dụ: "1.000.000₫"
- */
+// /**
+//  * Chỉ gửi số nguyên sang VNPay (không có dấu, không có ₫)
+//  * @param {number} amount - Giá trị USD
+//  * @returns {number} Ví dụ: 1000000
+//  */
+// export const formatCurrencyPayment = (amount) => {
+//   const USD_TO_VND = 5000;
+//   if (!amount || isNaN(amount)) return 0;
+//   const vndValue = amount * USD_TO_VND;
+//   return Math.round(vndValue); // trả về số nguyên, không dấu, không ký tự
+// };
+
+
+
+// src/utils/helpers.js
+
+const USD_TO_VND = 5000;
+
 export const formatCurrencyDisplay = (amount) => {
-  const USD_TO_VND = 24000;
-  if (!amount || isNaN(amount) || amount === 0) return "0₫";
+  if (!amount || isNaN(amount) || amount <= 0) return "0₫";
   const vndValue = amount * USD_TO_VND;
-  return vndValue.toLocaleString("vi-VN"); // chỉ hiển thị số, thêm ₫ nếu muốn
+  return vndValue.toLocaleString("vi-VN") + "₫";
 };
 
-/**
- * Chỉ gửi số nguyên sang VNPay (không có dấu, không có ₫)
- * @param {number} amount - Giá trị USD
- * @returns {number} Ví dụ: 1000000
- */
+// Chỉ gửi số nguyên sang VNPay, min 100₫
 export const formatCurrencyPayment = (amount) => {
-  const USD_TO_VND = 24000;
-  if (!amount || isNaN(amount)) return 0;
-  const vndValue = amount * USD_TO_VND;
-  return Math.round(vndValue); // trả về số nguyên
+  if (!amount || isNaN(amount) || amount <= 0) return 100; // tránh 0
+  const vndValue = Math.round(amount * USD_TO_VND);
+  return vndValue < 100 ? 100 : vndValue;
 };

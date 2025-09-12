@@ -25,6 +25,40 @@
 // });
 
 // module.exports = router;
+
+
+
+
+
+// // routes/orders.routes.js
+// const express = require("express");
+// const router = express.Router();
+
+// let ordersDB = [];
+
+// router.post("/create", (req, res) => {
+//   try {
+//     const { orderId, cart, total } = req.body;
+//     if (!orderId || !total) {
+//       return res.status(400).json({ message: "Thiếu dữ liệu orderId hoặc total" });
+//     }
+
+//     const order = { orderId, cart, total, status: "pending" };
+//     ordersDB.push(order);
+
+//     console.log("✅ Order created:", order);
+//     res.json({ message: "Order created", order });
+//   } catch (err) {
+//     console.error("❌ Order error:", err);
+//     res.status(500).json({ message: "Có lỗi khi tạo order" });
+//   }
+// });
+
+// module.exports = router;
+
+
+
+
 const express = require("express");
 const router = express.Router();
 
@@ -32,17 +66,18 @@ let ordersDB = [];
 
 router.post("/create", (req, res) => {
   try {
-    const { cart, total } = req.body;
-    if (!cart || !total) return res.status(400).json({ message: "Thiếu dữ liệu" });
+    const { orderId, cart, total } = req.body;
+    if (!orderId || !total) {
+      return res.status(400).json({ message: "Thiếu dữ liệu orderId hoặc total" });
+    }
 
-    const orderId = "EDP" + Date.now();
     const order = { orderId, cart, total, status: "pending" };
-
     ordersDB.push(order);
-    console.log("Order created:", order);
-    res.json({ message: "Order created", order });
+
+    console.log("✅ Order created:", order);
+    res.json({ ok: true, order });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Order error:", err);
     res.status(500).json({ message: "Có lỗi khi tạo order" });
   }
 });

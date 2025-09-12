@@ -290,7 +290,8 @@ const Order = () => {
             }}
           >
             <Typography fontWeight={600} mb={2}>
-              Đơn hàng: {orderId || "---"}
+              Đơn hàng:
+              {orderId || "---"}
             </Typography>
             <Box sx={{ borderBottom: "1px solid #e0e0e0", mb: 2 }} />
 

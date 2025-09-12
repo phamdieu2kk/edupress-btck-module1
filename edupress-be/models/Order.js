@@ -14,3 +14,22 @@ const orderSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);
+
+
+// // models/Order.js
+// const mongoose = require("mongoose");
+
+// const orderSchema = new mongoose.Schema({
+//   orderId: { type: String, required: true, unique: true },
+//   cart: [
+//     {
+//       course: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+//       quantity: Number,
+//       checked: Boolean,
+//     },
+//   ],
+//   total: { type: Number, required: true },
+//   status: { type: String, default: "pending" },
+// });
+
+// module.exports = mongoose.model("Order", orderSchema);
