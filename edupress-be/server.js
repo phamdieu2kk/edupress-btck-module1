@@ -1,5 +1,3 @@
-
-
 // require("dotenv").config();
 // const express = require("express");
 // const cors = require("cors");
@@ -18,22 +16,17 @@
 // const cartRoutes = require("./routes/cartRoutes");
 // const ordersRoutes = require("./routes/orders.routes");
 // const vnpayRoutes = require("./routes/vnpay.routes");
-// const paymentRoutes = require("./routes/payment.routes");
 
+// const paymentRoutes = require("./routes/payment.routes");
 // const app = express();
 
 // // ===== Middlewares =====
-// // Parse JSON & URL-encoded bodies
 // app.use(express.json({ limit: "10mb" }));
-// app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+// app.use(express.urlencoded({ limit: "10mb", extended: true }));
+// // parse application/json
+// app.use(cookieParser());       // parse cookies
+// app.use(morgan("dev"));        // logging
 
-// // Parse cookies
-// app.use(cookieParser());
-
-// // Logging
-// app.use(morgan("dev"));
-
-// // ===== CORS =====
 // const allowedOrigins = [
 //   "http://localhost:5173", // FE customer
 //   "http://localhost:5174", // FE admin
@@ -50,20 +43,18 @@
 //   credentials: true,
 // }));
 
-// // ===== Disable cache =====
+// // Tắt cache
 // app.disable("etag");
 // app.use((req, res, next) => {
 //   res.set("Cache-Control", "no-store");
 //   next();
 // });
 
-// // ===== Static files =====
+// // ===== Static =====
 // app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// // ===== Health check =====
+// // ===== Routes =====
 // app.get("/api/health", (req, res) => res.json({ ok: true }));
-
-// // ===== API Routes =====
 // app.use("/api/auth", authRoutes);
 // app.use("/api/users", userRoutes);
 // app.use("/api/courses", courseRoutes);
@@ -73,25 +64,25 @@
 // app.use("/api/cart", cartRoutes);
 // app.use("/api/orders", ordersRoutes);
 // app.use("/api/vnpay", vnpayRoutes);
+
 // app.use("/api/payment", paymentRoutes);
 
-// // ===== Connect to MongoDB & Start Server =====
-// const MONGO_URI =
-//   process.env.MONGO_URI || "mongodb://127.0.0.1:27017/edupress";
+// // ===== Connect Database & Start Server =====
+// const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/edupress";
 // const PORT = process.env.PORT || 5000;
 
-// mongoose
-//   .connect(MONGO_URI)
+// mongoose.connect(MONGO_URI)
 //   .then(() => {
-//     console.log("✅ MongoDB connected:", MONGO_URI);
-//     app.listen(PORT, () => {
-//       console.log(`🚀 Server running on port ${PORT}`);
-//     });
+//     console.log('✅ MongoDB connected');
+//     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 //   })
-//   .catch((err) => {
-//     console.error("❌ MongoDB connection error:", err.message);
+//   .catch(err => {
+//     console.error('❌ MongoDB connection error:', err.message);
 //     process.exit(1);
 //   });
+
+
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -142,6 +133,94 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.get("/api/health", (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
+// app.get("/", (req, res) => {
+//   res.redirect(process.env.CLIENT_URL || "https://edupress-fe.netlify.app");
+// });
+
+// ===== Root page HTML đẹp =====
+app.get("/", (req, res) => {
+  const frontendURL = process.env.CLIENT_URL || "https://edupress-fe.netlify.app";
+  const apiURL = req.protocol + "://" + req.get("host");
+
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>EduPress Backend</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #f3f4f6;
+          color: #111827;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 700px;
+          margin: 60px auto;
+          background: #fff;
+          padding: 30px;
+          border-radius: 12px;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+          text-align: center;
+        }
+        h1 {
+          color: #2563eb;
+          margin-bottom: 10px;
+        }
+        p {
+          font-size: 1.1rem;
+        }
+        a {
+          color: #2563eb;
+          text-decoration: none;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+        code {
+          background: #f3f4f6;
+          padding: 2px 6px;
+          border-radius: 6px;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 0.85rem;
+          color: #6b7280;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🚀 EduPress Backend API</h1>
+        <p>Status: <b style="color:green">Running ✅</b></p>
+        <p>Frontend: <a href="${frontendURL}" target="_blank">${frontendURL}</a></p>
+        <p>API Base URL: <code>${apiURL}</code></p>
+        <p>Health Check: <code>${apiURL}/api/health</code></p>
+        <p>Other API Endpoints:</p>
+        <ul style="list-style:none; padding-left:0;">
+          <li><code>/api/auth</code></li>
+          <li><code>/api/users</code></li>
+          <li><code>/api/courses</code></li>
+          <li><code>/api/blogs</code></li>
+          <li><code>/api/lessons</code></li>
+          <li><code>/api/instructors</code></li>
+          <li><code>/api/cart</code></li>
+          <li><code>/api/orders</code></li>
+          <li><code>/api/vnpay</code></li>
+          <li><code>/api/payment</code></li>
+        </ul>
+        <div class="footer">&copy; ${new Date().getFullYear()} EduPress</div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+
+
 
 // ===== Routes =====
 app.use("/api/auth", require("./routes/auth.routes"));
