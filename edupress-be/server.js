@@ -103,6 +103,7 @@ app.use(morgan("dev"));
 const allowedOrigins = [
   "http://localhost:5173", // FE customer local
   "http://localhost:5174", // FE admin local
+  "https://edupress-fe.netlify.app",
   process.env.CLIENT_URL, // FE deployed
 ].filter(Boolean);
 
@@ -199,19 +200,8 @@ app.get("/", (req, res) => {
         <p>Frontend: <a href="${frontendURL}" target="_blank">${frontendURL}</a></p>
         <p>API Base URL: <code>${apiURL}</code></p>
         <p>Health Check: <code>${apiURL}/api/health</code></p>
-        <p>Other API Endpoints:</p>
-        <ul style="list-style:none; padding-left:0;">
-          <li><code>/api/auth</code></li>
-          <li><code>/api/users</code></li>
-          <li><code>/api/courses</code></li>
-          <li><code>/api/blogs</code></li>
-          <li><code>/api/lessons</code></li>
-          <li><code>/api/instructors</code></li>
-          <li><code>/api/cart</code></li>
-          <li><code>/api/orders</code></li>
-          <li><code>/api/vnpay</code></li>
-          <li><code>/api/payment</code></li>
-        </ul>
+        
+        
         <div class="footer">&copy; ${new Date().getFullYear()} EduPress</div>
       </div>
     </body>
