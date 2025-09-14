@@ -5,7 +5,7 @@ import Layout from "./components/Layout";
 
 // Pages
 import Dashboard from "./pages/Dashboard";
-import Courses from "./pages/Courses";
+// import Courses from "./pages/courses/Courses";
 import CourseDetail from "./pages/courses/CourseDetail";
 import Lessons from "./pages/Lessons";
 import LessonCreateEdit from "./pages/lessons/LessonCreateEdit";
@@ -13,7 +13,7 @@ import RevenueReport from "./pages/reports/RevenueReport";
 import RevenueDetail from "./pages/reports/RevenueDetail";
 import ReviewManagement from "./pages/reviews/ReviewManagement";
 import CourseCreate from "./pages/courses/CourseCreate";
-
+import Courses from "./pages/courses/Courses";
 // Blog Pages
 import Blogs from "./pages/Blogs";
 import BlogCreateEdit from "./pages/BlogCreateEdit";

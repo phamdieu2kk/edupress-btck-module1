@@ -351,7 +351,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
-import CourseDetail from "./courses/CourseDetail";
+import CourseDetail from "./CourseDetail";
 import { useNavigate } from "react-router-dom";
 
 const Courses = () => {
