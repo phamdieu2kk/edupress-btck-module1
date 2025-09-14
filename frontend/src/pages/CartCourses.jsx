@@ -500,7 +500,6 @@
 
 
 
-
 // src/components/CartCourses.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -515,8 +514,7 @@ import { useCart } from "../context/CartContext";
 import CartItems from "../components/CartItem";
 import CartSummary from "../components/CartSummary";
 import Footer from "./Footer";
-// import PaymentPage from "./PaymentPage"; // Không cần import ở đây
-import { formatCurrencyDisplay } from "../utils/helpers"; // ✅ Nhập hàm định dạng từ tệp tiện ích
+import { formatCurrencyDisplay } from "../utils/helpers";
 
 const CartCourses = () => {
   const { cart, setCart } = useCart();
@@ -529,11 +527,15 @@ const CartCourses = () => {
   const fetchCart = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/cart", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setCart(
-        (res.data.items || []).map((item) => ({ ...item, checked: true }))
+        (res.data.items || []).map((item) => ({
+          ...item,
+          checked: true,
+        }))
       );
     } catch (err) {
       console.error("Fetch cart error:", err);
@@ -547,11 +549,12 @@ const CartCourses = () => {
     fetchCart();
   }, []);
 
-  // Toggle
+  // Toggle select
   const toggleSelectAll = (checked) => {
     setSelectAll(checked);
     setCart((prev) => prev.map((item) => ({ ...item, checked })));
   };
+
   const toggleChecked = (itemId) => {
     setCart((prev) =>
       prev.map((c) =>
@@ -559,19 +562,19 @@ const CartCourses = () => {
       )
     );
   };
+
   useEffect(() => {
     setSelectAll(cart.length > 0 && cart.every((item) => item.checked));
   }, [cart]);
 
-  // Price helpers
-  // ✅ Xóa hàm formatCurrency cục bộ
+  // Price helpers (an toàn với course null)
   const totalSelectedItems = cart.filter((i) => i.checked).length;
   const totalPrice = cart
     .filter((i) => i.checked)
-    .reduce((sum, i) => sum + i.course.price * i.quantity, 0);
+    .reduce((sum, i) => sum + ((i.course?.price || 0) * i.quantity), 0);
   const isAnyItemSelected = cart.some((item) => item.checked);
 
-  // Loading & Empty
+  // Loading & Empty state
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={5}>
@@ -579,6 +582,7 @@ const CartCourses = () => {
       </Box>
     );
   }
+
   if (cart.length === 0) {
     return (
       <Box
@@ -610,11 +614,9 @@ const CartCourses = () => {
 
   return (
     <>
-      <Box
-        sx={{ maxWidth: 1200, mx: "auto", mt: 5, px: 2, minHeight: "60vh" }}
-      >
+      <Box sx={{ maxWidth: 1200, mx: "auto", mt: 5, px: 2, minHeight: "60vh" }}>
         <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
-          {/* Left column rộng hơn */}
+          {/* Left column */}
           <Box flex={{ xs: "1 1 100%", md: "2 1 0%" }}>
             <CartItems
               cart={cart}
@@ -625,7 +627,7 @@ const CartCourses = () => {
               deleteCartItem={async (id) => {
                 try {
                   setCart((prev) => prev.filter((i) => i._id !== id));
-                  await axios.delete(`http://localhost:5000/api/cart/${id}`, {
+                  await axios.delete(`${import.meta.env.VITE_API_URL}/cart/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                   });
                 } catch (err) {
@@ -635,23 +637,21 @@ const CartCourses = () => {
               handleQuantityChange={(id, qty) => {
                 if (qty < 1) return;
                 setCart((prev) =>
-                  prev.map((i) =>
-                    i._id === id ? { ...i, quantity: qty } : i
-                  )
+                  prev.map((i) => (i._id === id ? { ...i, quantity: qty } : i))
                 );
                 // TODO: debounce update API
               }}
               totalPrice={totalPrice}
-              formatCurrency={formatCurrencyDisplay} // ✅ Dùng hàm đã import
+              formatCurrency={formatCurrencyDisplay}
             />
           </Box>
 
-          {/* Right column nhỏ hơn */}
+          {/* Right column */}
           <Box flex={{ xs: "1 1 100%", md: "1 1 0%" }}>
             <CartSummary
               totalSelectedItems={totalSelectedItems}
               totalPrice={totalPrice}
-              formatCurrency={formatCurrencyDisplay} // ✅ Dùng hàm đã import
+              formatCurrency={formatCurrencyDisplay}
               isAnyItemSelected={isAnyItemSelected}
             />
           </Box>
@@ -663,7 +663,6 @@ const CartCourses = () => {
 };
 
 export default CartCourses;
-
 
 
 
