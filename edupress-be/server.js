@@ -116,6 +116,8 @@ app.get("/", (req, res) => {
         <h1>🚀 EduPress Backend API</h1>
         <p>Status: <b style="color:green">Running ✅</b></p>
         <p>Frontend: <a href="${frontendURL}" target="_blank">${frontendURL}</a></p>
+        <p>Admin Frontend: <a href="${process.env.ADMIN_URL}" target="_blank">${process.env.ADMIN_URL}</a></p>
+
         <p>API Base URL: <code>${apiURL}</code></p>
         <p>Health Check: <code>${apiURL}/api/health</code></p>
         
