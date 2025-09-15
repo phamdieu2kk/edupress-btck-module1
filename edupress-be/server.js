@@ -20,7 +20,7 @@ const allowedOrigins = [
   "http://localhost:5173", // FE customer local
   "http://localhost:5174", // FE admin local
   "https://fe-edupress.netlify.app/",
-   "https://edupress-admin.netlify.app", 
+   "https://edupressadmin.netlify.app", 
   process.env.CLIENT_URL, // FE deployed
    process.env.ADMIN_URL  ,
 ].filter(Boolean);
@@ -59,7 +59,7 @@ app.get("/api/health", (req, res) => {
 // ===== Root page HTML đẹp =====
 app.get("/", (req, res) => {
   const frontendURL = process.env.CLIENT_URL || "https://edupress-fe.netlify.app";
-  const adminURL = process.env.ADMIN_URL || "https://edupress-admin.netlify.app";
+  const adminURL = process.env.ADMIN_URL || "https://edupressadmin.netlify.app";
   const apiURL = req.protocol + "://" + req.get("host");
 
   res.send(`
