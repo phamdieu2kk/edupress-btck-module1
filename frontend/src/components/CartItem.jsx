@@ -1,4 +1,3 @@
-// src/components/CartItems.jsx
 import React from "react";
 import {
   Box,
@@ -23,40 +22,24 @@ import { motion } from "framer-motion";
 import { formatCurrencyDisplay } from "../utils/helpers";
 import { useCart } from "../context/CartContext";
 
-const CartItems = ({ cart, selectAll, toggleSelectAll, toggleChecked, isMobile }) => {
-  const { updateCartItemLocalDebounced, removeFromCart } = useCart();
+const CartItems = ({ selectAll, toggleSelectAll, toggleChecked, isMobile }) => {
+  const { cart, updateCartItemLocalDebounced, removeFromCart } = useCart();
 
   const formatPrice = (price, originalPrice) => {
-    if (price === 0) {
-      return (
-        <Typography color="success.main" fontWeight={600}>
-          Free
-        </Typography>
-      );
-    }
-    if (originalPrice && originalPrice > price) {
+    if (price === 0)
+      return <Typography color="success.main" fontWeight={600}>Free</Typography>;
+    if (originalPrice && originalPrice > price)
       return (
         <Stack direction="row" spacing={1} alignItems="center">
-          <Typography
-            variant="body2"
-            sx={{ textDecoration: "line-through", color: "text.secondary" }}
-          >
+          <Typography variant="body2" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
             {formatCurrencyDisplay(originalPrice)}
           </Typography>
-          <Typography fontWeight={700} color="error">
-            {formatCurrencyDisplay(price)}
-          </Typography>
+          <Typography fontWeight={700} color="error">{formatCurrencyDisplay(price)}</Typography>
         </Stack>
       );
-    }
-    return (
-      <Typography fontWeight={700} color="error">
-        {formatCurrencyDisplay(price)}
-      </Typography>
-    );
+    return <Typography fontWeight={700} color="error">{formatCurrencyDisplay(price)}</Typography>;
   };
 
-  // Tính tổng giá
   const totalPrice = cart.reduce((sum, item) => {
     const course = item.course || {};
     return sum + (course.price || 0) * item.quantity;
@@ -71,132 +54,57 @@ const CartItems = ({ cart, selectAll, toggleSelectAll, toggleChecked, isMobile }
   }
 
   return (
-    <Box
-      flex={2}
-      sx={{
-        p: 3,
-        borderRadius: 2,
-        bgcolor: "#fff",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-      }}
-    >
-      <Typography variant="h5" fontWeight={700} mb={2}>
-        Your cart
-      </Typography>
+    <Box flex={2} sx={{ p: 3, borderRadius: 2, bgcolor: "#fff", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
+      <Typography variant="h5" fontWeight={700} mb={2}>Your cart</Typography>
 
       {!isMobile ? (
-        <>
-          {/* --- Desktop --- */}
-          <TableContainer
-            component={Paper}
-            elevation={0}
-            sx={{ border: "1px solid #e0e0e0", borderRadius: 2 }}
-          >
-            <Table size="small" sx={{ minWidth: 600 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectAll}
-                      onChange={(e) => toggleSelectAll(e.target.checked)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>Product</TableCell>
-                  <TableCell align="center">Price</TableCell>
-                  <TableCell align="center">Quantity</TableCell>
-                  <TableCell align="right"></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {cart.map((item) => {
-                  const course = item.course || {};
-                  return (
-                    <TableRow
-                      key={item._id}
-                      hover
-                      component={motion.tr}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={item.checked || false}
-                          onChange={() => toggleChecked(item._id)}
-                          size="small"
+        <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid #e0e0e0", borderRadius: 2 }}>
+          <Table size="small" sx={{ minWidth: 600 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox checked={selectAll} onChange={(e) => toggleSelectAll(e.target.checked)} size="small" />
+                </TableCell>
+                <TableCell>Product</TableCell>
+                <TableCell align="center">Price</TableCell>
+                <TableCell align="center">Quantity</TableCell>
+                <TableCell align="right"></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {cart.map((item) => {
+                const course = item.course || {};
+                return (
+                  <TableRow key={item._id} hover component={motion.tr} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                    <TableCell padding="checkbox">
+                      <Checkbox checked={item.checked || false} onChange={() => toggleChecked(item._id)} size="small" />
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 300, maxWidth: 400 }}>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <CardMedia
+                          component="img"
+                          image={course.image || "https://via.placeholder.com/80"}
+                          alt={course.title || "No Title"}
+                          sx={{ width: 60, height: 45, borderRadius: 1, objectFit: "cover" }}
                         />
-                      </TableCell>
-                      <TableCell sx={{ minWidth: 300, maxWidth: 400 }}>
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <CardMedia
-                            component="img"
-                            image={course.image || "https://via.placeholder.com/80"}
-                            alt={course.title || "No Title"}
-                            sx={{
-                              width: 60,
-                              height: 45,
-                              borderRadius: 1,
-                              objectFit: "cover",
-                            }}
-                          />
-                          <Typography
-                            sx={{
-                              maxWidth: 250,
-                              whiteSpace: "normal",
-                              wordBreak: "break-word",
-                              fontWeight: 500,
-                            }}
-                          >
-                            {course.title || "No Title"}
-                          </Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell align="center">
-                        {formatPrice(course.price || 0, course.originalPrice)}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Stack
-                          direction="row"
-                          alignItems="center"
-                          justifyContent="center"
-                          sx={{
-                            border: "1px solid #ddd",
-                            borderRadius: 1,
-                            px: 0.5,
-                            mx: "auto",
-                            width: "fit-content",
-                          }}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              updateCartItemLocalDebounced(item._id, Math.max(1, item.quantity - 1))
-                            }
-                          >
-                            <RemoveIcon fontSize="small" />
-                          </IconButton>
-                          <motion.span
-                            key={item.quantity}
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            {item.quantity}
-                          </motion.span>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              updateCartItemLocalDebounced(item._id, item.quantity + 1)
-                            }
-                          >
-                            <AddIcon fontSize="small" />
-                          </IconButton>
-                        </Stack>
-                      </TableCell>
-                      <TableCell align="right">
-                        <IconButton onClick={() => removeFromCart(item._id)}>
-                          {/* SVG delete icon */}
-                          <svg
+                        <Typography sx={{ maxWidth: 250, whiteSpace: "normal", wordBreak: "break-word", fontWeight: 500 }}>
+                          {course.title || "No Title"}
+                        </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell align="center">{formatPrice(course.price || 0, course.originalPrice)}</TableCell>
+                    <TableCell align="center">
+                      <Stack direction="row" alignItems="center" justifyContent="center" sx={{ border: "1px solid #ddd", borderRadius: 1, px: 0.5, mx: "auto", width: "fit-content" }}>
+                        <IconButton size="small" onClick={() => updateCartItemLocalDebounced(item._id, Math.max(1, item.quantity - 1))}><RemoveIcon fontSize="small" /></IconButton>
+                        <motion.span key={item._id} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.2 }}>
+                          {item.quantity}
+                        </motion.span>
+                        <IconButton size="small" onClick={() => updateCartItemLocalDebounced(item._id, item.quantity + 1)}><AddIcon fontSize="small" /></IconButton>
+                      </Stack>
+                    </TableCell>
+                    <TableCell align="right">
+                      <IconButton onClick={() => removeFromCart(item._id)}>
+                        <svg
                             width="22"
                             height="22"
                             viewBox="0 0 16 16"
@@ -220,109 +128,52 @@ const CartItems = ({ cart, selectAll, toggleSelectAll, toggleChecked, isMobile }
                               fill="#333333"
                             />
                           </svg>
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          {/* Total */}
-          <Stack direction="row" justifyContent="flex-end" spacing={1} mt={3}>
-            <Typography variant="h6" fontWeight={700}>
-              Total Price
-            </Typography>
-            <Typography variant="h6" fontWeight={700} color="#e67e22">
-              {formatCurrencyDisplay(totalPrice || 0)}
-            </Typography>
-          </Stack>
-        </>
-      ) : (
-        <>
-          {/* --- Mobile --- */}
-          <Stack spacing={2}>
-            {cart.map((item) => {
-              const course = item.course || {};
-              return (
-                <Card
-                  key={item._id}
-                  component={motion.div}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <CardContent>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Checkbox
-                        checked={item.checked || false}
-                        onChange={() => toggleChecked(item._id)}
-                      />
-                      <CardMedia
-                        component="img"
-                        image={course.image || "https://via.placeholder.com/80"}
-                        alt={course.title || "No Title"}
-                        sx={{ width: 80, height: 60, borderRadius: 1 }}
-                      />
-                      <Box flex={1}>
-                        <Typography noWrap fontWeight={600}>
-                          {course.title || "No Title"}
-                        </Typography>
-                        {formatPrice(course.price || 0, course.originalPrice)}
-                      </Box>
-                      <Stack direction="row" alignItems="center">
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            updateCartItemLocalDebounced(item._id, Math.max(1, item.quantity - 1))
-                          }
-                        >
-                          <RemoveIcon fontSize="small" />
-                        </IconButton>
-                        <motion.span
-                          key={item.quantity}
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {item.quantity}
-                        </motion.span>
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            updateCartItemLocalDebounced(item._id, item.quantity + 1)
-                          }
-                        >
-                          <AddIcon fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                      <IconButton onClick={() => removeFromCart(item._id)}>
-                        {/* SVG delete icon */}
-                        <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
-                          <path
-                            d="M13.25 2H10.5V1.5C10.5 0.672906 9.82709 0 9 0H7C6.17291 0 5.5 0.672906 5.5 1.5V2H2.75C2.06075 2 1.5 2.56075 1.5 3.25V5C1.5 5.27612 1.72387 5.5 2 5.5H14C14.2761 5.5 14.5 5.27612 14.5 5V3.25C14.5 2.56075 13.9392 2 13.25 2Z"
-                            fill="#333"
-                          />
-                        </svg>
                       </IconButton>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              );
-            })}
-            <Stack direction="row" justifyContent="space-between" mt={2}>
-              <Typography variant="h6" fontWeight={700}>
-                Total Price
-              </Typography>
-              <Typography variant="h6" fontWeight={700} color="#e67e22">
-                {formatCurrencyDisplay(totalPrice || 0)}
-              </Typography>
-            </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+          <Stack direction="row" justifyContent="flex-end" spacing={1} mt={3}>
+            <Typography variant="h6" fontWeight={700}>Total Price</Typography>
+            <Typography variant="h6" fontWeight={700} color="#e67e22">{formatCurrencyDisplay(totalPrice)}</Typography>
           </Stack>
-        </>
+        </TableContainer>
+      ) : (
+        // --- Mobile ---
+        <Stack spacing={2}>
+          {cart.map((item) => {
+            const course = item.course || {};
+            return (
+              <Card key={item._id} component={motion.div} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                <CardContent>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Checkbox checked={item.checked || false} onChange={() => toggleChecked(item._id)} />
+                    <CardMedia component="img" image={course.image || "https://via.placeholder.com/80"} alt={course.title || "No Title"} sx={{ width: 80, height: 60, borderRadius: 1 }} />
+                    <Box flex={1}>
+                      <Typography noWrap fontWeight={600}>{course.title || "No Title"}</Typography>
+                      {formatPrice(course.price || 0, course.originalPrice)}
+                    </Box>
+                    <Stack direction="row" alignItems="center">
+                      <IconButton size="small" onClick={() => updateCartItemLocalDebounced(item._id, Math.max(1, item.quantity - 1))}><RemoveIcon fontSize="small" /></IconButton>
+                      <motion.span key={item._id} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.2 }}>{item.quantity}</motion.span>
+                      <IconButton size="small" onClick={() => updateCartItemLocalDebounced(item._id, item.quantity + 1)}><AddIcon fontSize="small" /></IconButton>
+                    </Stack>
+                    <IconButton onClick={() => removeFromCart(item._id)}><RemoveIcon /></IconButton>
+                  </Stack>
+                </CardContent>
+              </Card>
+            );
+          })}
+          <Stack direction="row" justifyContent="space-between" mt={2}>
+            <Typography variant="h6" fontWeight={700}>Total Price</Typography>
+            <Typography variant="h6" fontWeight={700} color="#e67e22">{formatCurrencyDisplay(totalPrice)}</Typography>
+          </Stack>
+        </Stack>
       )}
     </Box>
   );
 };
 
-export default CartItems;  
+export default CartItems;
