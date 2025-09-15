@@ -494,6 +494,12 @@
 
 
 
+
+
+
+
+
+
 // src/components/CartCourses.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -515,16 +521,12 @@ const CartCourses = () => {
   const [loading, setLoading] = useState(true);
   const [selectAll, setSelectAll] = useState(true);
 
-  // Lấy token an toàn SSR
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token = localStorage.getItem("token");
 
   // Fetch Cart
   const fetchCart = async () => {
     setLoading(true);
     try {
-      if (!token) throw new Error("No token found");
-
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -532,7 +534,7 @@ const CartCourses = () => {
       setCart(
         (res.data.items || []).map((item) => ({
           ...item,
-          checked: true, // mặc định checked
+          checked: true,
         }))
       );
     } catch (err) {
@@ -555,7 +557,9 @@ const CartCourses = () => {
 
   const toggleChecked = (itemId) => {
     setCart((prev) =>
-      prev.map((c) => (c._id === itemId ? { ...c, checked: !c.checked } : c))
+      prev.map((c) =>
+        c._id === itemId ? { ...c, checked: !c.checked } : c
+      )
     );
   };
 
@@ -563,11 +567,11 @@ const CartCourses = () => {
     setSelectAll(cart.length > 0 && cart.every((item) => item.checked));
   }, [cart]);
 
-  // Tính toán tổng
+  // Price helpers (an toàn với course null)
   const totalSelectedItems = cart.filter((i) => i.checked).length;
   const totalPrice = cart
     .filter((i) => i.checked)
-    .reduce((sum, i) => sum + Math.round((i.course?.price || 0) * i.quantity), 0);
+    .reduce((sum, i) => sum + ((i.course?.price || 0) * i.quantity), 0);
   const isAnyItemSelected = cart.some((item) => item.checked);
 
   // Loading & Empty state
@@ -635,6 +639,7 @@ const CartCourses = () => {
                 setCart((prev) =>
                   prev.map((i) => (i._id === id ? { ...i, quantity: qty } : i))
                 );
+                // TODO: debounce update API
               }}
               totalPrice={totalPrice}
               formatCurrency={formatCurrencyDisplay}
@@ -658,6 +663,12 @@ const CartCourses = () => {
 };
 
 export default CartCourses;
+
+
+
+
+
+
 
 
 
