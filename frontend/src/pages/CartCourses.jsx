@@ -497,9 +497,6 @@
 
 
 
-
-
-
 // src/components/CartCourses.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -511,8 +508,8 @@ import {
   Stack,
 } from "@mui/material";
 import { useCart } from "../context/CartContext";
-import CartItems from "../components/CartItem";
-import CartSummary from "../components/CartSummary";
+import CartItems from "../components/CartItem"; // sửa đúng tên file
+import CartSummary from "../components/CartSummary";// sửa đúng tên file
 import Footer from "./Footer";
 import { formatCurrencyDisplay } from "../utils/helpers";
 
@@ -521,12 +518,14 @@ const CartCourses = () => {
   const [loading, setLoading] = useState(true);
   const [selectAll, setSelectAll] = useState(true);
 
-  const token = localStorage.getItem("token");
+  // an toàn với SSR / Netlify
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   // Fetch Cart
   const fetchCart = async () => {
     setLoading(true);
     try {
+      if (!token) throw new Error("No token found");
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -571,7 +570,7 @@ const CartCourses = () => {
   const totalSelectedItems = cart.filter((i) => i.checked).length;
   const totalPrice = cart
     .filter((i) => i.checked)
-    .reduce((sum, i) => sum + ((i.course?.price || 0) * i.quantity), 0);
+    .reduce((sum, i) => sum + Math.round((i.course?.price || 0) * i.quantity), 0); // nguyên số
   const isAnyItemSelected = cart.some((item) => item.checked);
 
   // Loading & Empty state
@@ -639,7 +638,6 @@ const CartCourses = () => {
                 setCart((prev) =>
                   prev.map((i) => (i._id === id ? { ...i, quantity: qty } : i))
                 );
-                // TODO: debounce update API
               }}
               totalPrice={totalPrice}
               formatCurrency={formatCurrencyDisplay}
@@ -663,12 +661,6 @@ const CartCourses = () => {
 };
 
 export default CartCourses;
-
-
-
-
-
-
 
 
 

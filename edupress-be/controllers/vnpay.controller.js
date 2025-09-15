@@ -623,7 +623,7 @@ const createPayment = (req, res) => {
 
     const ipAddr = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1";
     const createDate = moment().format("YYYYMMDDHHmmss");
-    const expireDate = moment().add(15, "minutes").format("YYYYMMDDHHmmss");
+    const expireDate = moment().add(30, "minutes").format("YYYYMMDDHHmmss");
 
     const vnp_Params = {
       vnp_Version: "2.1.0",
