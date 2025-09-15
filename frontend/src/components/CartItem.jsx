@@ -21,17 +21,11 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import { motion } from "framer-motion";
 import { formatCurrencyDisplay } from "../utils/helpers";
+import { useCart } from "../context/CartContext";
 
-const CartItems = ({
-  cart,
-  selectAll,
-  toggleSelectAll,
-  toggleChecked,
-  handleQuantityChange,
-  deleteCartItem,
-  totalPrice,
-  isMobile,
-}) => {
+const CartItems = ({ cart, selectAll, toggleSelectAll, toggleChecked, isMobile }) => {
+  const { updateCartItemLocalDebounced, removeFromCart } = useCart();
+
   const formatPrice = (price, originalPrice) => {
     if (price === 0) {
       return (
@@ -61,6 +55,12 @@ const CartItems = ({
       </Typography>
     );
   };
+
+  // Tính tổng giá
+  const totalPrice = cart.reduce((sum, item) => {
+    const course = item.course || {};
+    return sum + (course.price || 0) * item.quantity;
+  }, 0);
 
   if (!cart || cart.length === 0) {
     return (
@@ -121,7 +121,7 @@ const CartItems = ({
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
-                          checked={item.checked}
+                          checked={item.checked || false}
                           onChange={() => toggleChecked(item._id)}
                           size="small"
                         />
@@ -170,7 +170,7 @@ const CartItems = ({
                           <IconButton
                             size="small"
                             onClick={() =>
-                              handleQuantityChange(item._id, item.quantity - 1)
+                              updateCartItemLocalDebounced(item._id, Math.max(1, item.quantity - 1))
                             }
                           >
                             <RemoveIcon fontSize="small" />
@@ -186,7 +186,7 @@ const CartItems = ({
                           <IconButton
                             size="small"
                             onClick={() =>
-                              handleQuantityChange(item._id, item.quantity + 1)
+                              updateCartItemLocalDebounced(item._id, item.quantity + 1)
                             }
                           >
                             <AddIcon fontSize="small" />
@@ -194,8 +194,8 @@ const CartItems = ({
                         </Stack>
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton onClick={() => deleteCartItem(item._id)}>
-                          {/* SVG icon */}
+                        <IconButton onClick={() => removeFromCart(item._id)}>
+                          {/* SVG delete icon */}
                           <svg
                             width="22"
                             height="22"
@@ -255,7 +255,7 @@ const CartItems = ({
                   <CardContent>
                     <Stack direction="row" spacing={2} alignItems="center">
                       <Checkbox
-                        checked={item.checked}
+                        checked={item.checked || false}
                         onChange={() => toggleChecked(item._id)}
                       />
                       <CardMedia
@@ -274,7 +274,7 @@ const CartItems = ({
                         <IconButton
                           size="small"
                           onClick={() =>
-                            handleQuantityChange(item._id, item.quantity - 1)
+                            updateCartItemLocalDebounced(item._id, Math.max(1, item.quantity - 1))
                           }
                         >
                           <RemoveIcon fontSize="small" />
@@ -290,15 +290,20 @@ const CartItems = ({
                         <IconButton
                           size="small"
                           onClick={() =>
-                            handleQuantityChange(item._id, item.quantity + 1)
+                            updateCartItemLocalDebounced(item._id, item.quantity + 1)
                           }
                         >
                           <AddIcon fontSize="small" />
                         </IconButton>
                       </Stack>
-                      <IconButton onClick={() => deleteCartItem(item._id)}>
-                        {/* SVG same as above */}
-                        {/* ... */}
+                      <IconButton onClick={() => removeFromCart(item._id)}>
+                        {/* SVG delete icon */}
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
+                          <path
+                            d="M13.25 2H10.5V1.5C10.5 0.672906 9.82709 0 9 0H7C6.17291 0 5.5 0.672906 5.5 1.5V2H2.75C2.06075 2 1.5 2.56075 1.5 3.25V5C1.5 5.27612 1.72387 5.5 2 5.5H14C14.2761 5.5 14.5 5.27612 14.5 5V3.25C14.5 2.56075 13.9392 2 13.25 2Z"
+                            fill="#333"
+                          />
+                        </svg>
                       </IconButton>
                     </Stack>
                   </CardContent>

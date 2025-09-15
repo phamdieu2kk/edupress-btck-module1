@@ -84,15 +84,6 @@ router.put("/", verifyToken, async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
 // DELETE xoá sản phẩm khỏi cart
 router.delete("/:itemId", verifyToken, async (req, res) => {
   try {
