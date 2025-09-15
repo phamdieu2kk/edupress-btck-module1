@@ -33,11 +33,11 @@ const Blogs = () => {
     try {
       setLoading(true);
       const res = await axios.get(`${BASE_URL}?page=${pageNumber + 1}&limit=${limit}`);
-      // backend trả về: { blogs: [...], total: số lượng }
+      // backend returns: { blogs: [...], total: number }
       setBlogs(res.data.blogs || []);
       setTotal(res.data.total || res.data.totalDocs || 0);
     } catch (err) {
-      console.error("❌ Lỗi fetch blogs:", err);
+      console.error("❌ Error fetching blogs:", err);
     } finally {
       setLoading(false);
     }
@@ -48,12 +48,12 @@ const Blogs = () => {
   }, [page, pageSize]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) return;
+    if (!window.confirm("Are you sure you want to delete this blog?")) return;
     try {
       await axios.delete(`${BASE_URL}/${id}`);
       fetchBlogs(page, pageSize); // refresh list
     } catch (err) {
-      console.error("❌ Lỗi xóa blog:", err);
+      console.error("❌ Error deleting blog:", err);
     }
   };
 
@@ -75,25 +75,36 @@ const Blogs = () => {
     <Box p={3}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" fontWeight={700}>
-          Quản lý Blog
+          Blog Management
         </Typography>
-        <Button variant="contained" component={Link} to="/admin/blogs/create">
-          + Thêm mới
+        <Button
+          sx={{
+            backgroundColor: "#FB8C00",
+            "&:hover": { backgroundColor: "#FF9800" },
+            fontSize: "0.8rem",
+          }}
+          variant="contained"
+          component={Link}
+          to="/admin/blogs/create"
+        >
+          + Create New Blog
         </Button>
       </Stack>
 
       <TableContainer component={Paper}>
         <Table>
-          <TableHead sx={{ bgcolor: "#f5f5f5" }}>
+          <TableHead sx={{ bgcolor: "#FFF3E0" }}>
             <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Ảnh</TableCell>
-              <TableCell>Tiêu đề</TableCell>
-              <TableCell>Tác giả</TableCell>
-              <TableCell>Ngày</TableCell>
-              <TableCell>Tags</TableCell>
-              <TableCell align="center">Hành động</TableCell>
-            </TableRow>
+    <TableCell sx={{ color: "#FB8C00", fontWeight: 600 }}>No.</TableCell>
+    <TableCell sx={{ color: "#FB8C00", fontWeight: 600 }}>Image</TableCell>
+    <TableCell sx={{ color: "#FB8C00", fontWeight: 600 }}>Title</TableCell>
+    <TableCell sx={{ color: "#FB8C00", fontWeight: 600 }}>Author</TableCell>
+    <TableCell sx={{ color: "#FB8C00", fontWeight: 600 }}>Date</TableCell>
+    <TableCell sx={{ color: "#FB8C00", fontWeight: 600 }}>Tags</TableCell>
+    <TableCell align="center" sx={{ color: "#FB8C00", fontWeight: 600 }}>
+      Actions
+    </TableCell>
+  </TableRow>
           </TableHead>
 
           <TableBody>
@@ -112,14 +123,25 @@ const Blogs = () => {
                   </TableCell>
                   <TableCell>{blog.title}</TableCell>
                   <TableCell>{blog.author}</TableCell>
-                  <TableCell>{new Date(blog.date || blog.createdAt).toLocaleDateString("vi-VN")}</TableCell>
+                  <TableCell>
+                    {new Date(blog.date || blog.createdAt).toLocaleDateString("en-GB")}
+                  </TableCell>
                   <TableCell>{blog.tags?.join(", ")}</TableCell>
                   <TableCell align="center">
                     <Stack direction="row" spacing={1} justifyContent="center">
-                      <IconButton component={Link} to={`/admin/blogs/edit/${blog._id}`} size="small" color="primary">
+                      <IconButton
+                        component={Link}
+                        to={`/admin/blogs/edit/${blog._id}`}
+                        size="small"
+                        color="primary"
+                      >
                         <Edit />
                       </IconButton>
-                      <IconButton onClick={() => handleDelete(blog._id)} size="small" color="error">
+                      <IconButton
+                        onClick={() => handleDelete(blog._id)}
+                        size="small"
+                        color="error"
+                      >
                         <Delete />
                       </IconButton>
                     </Stack>
@@ -129,7 +151,7 @@ const Blogs = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  Không có bài viết nào
+                  No blogs available
                 </TableCell>
               </TableRow>
             )}
@@ -145,7 +167,7 @@ const Blogs = () => {
         rowsPerPage={pageSize}
         onRowsPerPageChange={handleChangeRowsPerPage}
         rowsPerPageOptions={[6, 10, 20, 50]}
-        labelRowsPerPage="Số hàng mỗi trang:"
+        labelRowsPerPage="Rows per page:"
       />
     </Box>
   );

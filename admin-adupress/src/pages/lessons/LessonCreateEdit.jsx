@@ -28,7 +28,7 @@ const LessonCreateEdit = () => {
     section: "",
     order: 1,
     courseId: courseId || "",
-    lessons: 0, // Khởi tạo trường lessons
+    lessons: 0,
     subLessons: [{ title: "", duration: "" }],
   });
 
@@ -38,15 +38,15 @@ const LessonCreateEdit = () => {
     severity: "success",
   });
 
-  // Tính tổng số bài học
+  // Calculate total subLessons
   const updateLessonsCount = () => {
     setLesson((prevLesson) => ({
       ...prevLesson,
-      lessons: prevLesson.subLessons.length, // Số lượng bài học = số lượng subLessons
+      lessons: prevLesson.subLessons.length,
     }));
   };
 
-  // Load dữ liệu khi edit
+  // Load data for edit
   useEffect(() => {
     if (id) {
       axios
@@ -73,7 +73,7 @@ const LessonCreateEdit = () => {
     const { name, value } = e.target;
     const updated = [...lesson.subLessons];
     updated[index][name] = value;
-    setLesson({ ...lesson, subLessons: updated }, updateLessonsCount); // Cập nhật số lượng bài học
+    setLesson({ ...lesson, subLessons: updated }, updateLessonsCount);
   };
 
   const handleAddSubLesson = () => {
@@ -82,7 +82,7 @@ const LessonCreateEdit = () => {
         ...lesson,
         subLessons: [...lesson.subLessons, { title: "", duration: "" }],
       },
-      updateLessonsCount // Tính lại số lượng bài học
+      updateLessonsCount
     );
   };
 
@@ -92,7 +92,7 @@ const LessonCreateEdit = () => {
         ...lesson,
         subLessons: lesson.subLessons.filter((_, i) => i !== index),
       },
-      updateLessonsCount // Tính lại số lượng bài học
+      updateLessonsCount
     );
   };
 
@@ -105,14 +105,14 @@ const LessonCreateEdit = () => {
         await axios.put(`http://localhost:5000/api/lessons/${id}`, payload);
         setSnackbar({
           open: true,
-          message: "Cập nhật bài học thành công!",
+          message: "Lesson updated successfully!",
           severity: "success",
         });
       } else {
         await axios.post(`http://localhost:5000/api/lessons`, payload);
         setSnackbar({
           open: true,
-          message: "Tạo bài học mới thành công!",
+          message: "New lesson created successfully!",
           severity: "success",
         });
       }
@@ -122,7 +122,7 @@ const LessonCreateEdit = () => {
       console.error("Error saving lesson:", err.response?.data || err);
       setSnackbar({
         open: true,
-        message: err.response?.data?.message || "Có lỗi xảy ra!",
+        message: err.response?.data?.message || "An error occurred!",
         severity: "error",
       });
     }
@@ -130,7 +130,7 @@ const LessonCreateEdit = () => {
 
   return (
     <Box p={{ xs: 2, sm: 4 }}>
-      {/* Snackbar nằm trên cùng */}
+      {/* Snackbar at top */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={2500}
@@ -146,16 +146,16 @@ const LessonCreateEdit = () => {
       </Snackbar>
 
       <Typography variant="h5" fontWeight={700} mb={3} color="orange">
-        {id ? "Chỉnh sửa Bài học" : "Tạo Bài học mới"}
+        {id ? "Edit Lesson" : "Create New Lesson"}
       </Typography>
 
       <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, boxShadow: 4 }}>
         <form onSubmit={handleSubmit}>
           <Stack spacing={3}>
-            {/* Thông tin bài học */}
+            {/* Lesson Info */}
             <Stack spacing={2}>
               <TextField
-                label="Tiêu đề"
+                label="Title"
                 name="title"
                 value={lesson.title}
                 onChange={handleChange}
@@ -163,7 +163,7 @@ const LessonCreateEdit = () => {
                 required
               />
               <TextField
-                label="Mô tả"
+                label="Description"
                 name="description"
                 value={lesson.description}
                 onChange={handleChange}
@@ -173,7 +173,7 @@ const LessonCreateEdit = () => {
               />
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                 <TextField
-                  label="Thời gian"
+                  label="Duration"
                   name="duration"
                   type="number"
                   value={lesson.duration}
@@ -181,7 +181,7 @@ const LessonCreateEdit = () => {
                   sx={{ flex: 1 }}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">phút</InputAdornment>
+                      <InputAdornment position="end">minutes</InputAdornment>
                     ),
                     inputProps: { min: 0 },
                   }}
@@ -194,7 +194,7 @@ const LessonCreateEdit = () => {
                   sx={{ flex: 1 }}
                 />
                 <TextField
-                  label="Thứ tự"
+                  label="Order"
                   type="number"
                   name="order"
                   value={lesson.order}
@@ -228,7 +228,7 @@ const LessonCreateEdit = () => {
                     alignItems={{ xs: "flex-start", sm: "center" }}
                   >
                     <TextField
-                      label="Tiêu đề SubLesson"
+                      label="SubLesson Title"
                       name="title"
                       value={sub.title}
                       onChange={(e) => handleSubLessonChange(index, e)}
@@ -236,7 +236,7 @@ const LessonCreateEdit = () => {
                       required
                     />
                     <TextField
-                      label="Thời gian"
+                      // label="Duration"
                       name="duration"
                       type="number"
                       value={sub.duration}
@@ -244,7 +244,7 @@ const LessonCreateEdit = () => {
                       sx={{ width: 150 }}
                       InputProps={{
                         endAdornment: (
-                          <InputAdornment position="end">phút</InputAdornment>
+                          <InputAdornment position="end">minutes</InputAdornment>
                         ),
                         inputProps: { min: 0 },
                       }}
@@ -263,11 +263,11 @@ const LessonCreateEdit = () => {
                 startIcon={<AddIcon />}
                 onClick={handleAddSubLesson}
               >
-                Thêm SubLesson
+                Add SubLesson
               </Button>
             </Stack>
 
-            {/* Nút Submit + Hủy nằm bên phải */}
+            {/* Submit + Cancel */}
             <Stack
               direction={{ xs: "column", sm: "row" }}
               spacing={2}
@@ -281,9 +281,9 @@ const LessonCreateEdit = () => {
                   color: "orange",
                   "&:hover": { backgroundColor: "orange", color: "white" },
                 }}
-                onClick={() => navigate(-1)} // quay lại trang trước
+                onClick={() => navigate(-1)}
               >
-                Hủy
+                Cancel
               </Button>
               <Button
                 type="submit"
@@ -294,7 +294,7 @@ const LessonCreateEdit = () => {
                   "&:hover": { backgroundColor: "darkorange" },
                 }}
               >
-                {id ? "Cập nhật" : "Tạo mới"}
+                {id ? "Update" : "Create"}
               </Button>
             </Stack>
           </Stack>

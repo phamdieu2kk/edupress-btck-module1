@@ -48,6 +48,18 @@ const STATUSES = [
   { label: "Inactive", value: "inactive" },
 ];
 
+// Hàm format hiển thị giá
+const formatPriceDisplay = (value) => {
+  if (value === null || value === undefined) return "";
+  return new Intl.NumberFormat("vi-VN").format(value) + " ₫";
+};
+
+// Hàm parse input từ người dùng
+const parsePriceInput = (input) => {
+  const numeric = input.replace(/\D/g, ""); // loại bỏ mọi ký tự không phải số
+  return numeric ? Number(numeric) * 1000 : 0; // nhân 1000 để lưu VND
+};
+
 const CourseDetail = ({ open, onClose, onSaved, course }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -173,8 +185,20 @@ const CourseDetail = ({ open, onClose, onSaved, course }) => {
           <TextField label="Giảng viên" name="instructor" value={form.instructor} onChange={handleChange} required fullWidth />
 
           <Stack direction="row" spacing={2}>
-            <TextField label="Giá gốc" type="number" name="originalPrice" value={form.originalPrice} onChange={handleChange} fullWidth />
-            <TextField label="Giá hiện tại" type="number" name="price" value={form.price} onChange={handleChange} fullWidth />
+            <TextField
+              label="Giá gốc"
+              name="originalPrice"
+              value={formatPriceDisplay(form.originalPrice / 1000)}
+              onChange={(e) => setForm({ ...form, originalPrice: parsePriceInput(e.target.value) })}
+              fullWidth
+            />
+            <TextField
+              label="Giá hiện tại"
+              name="price"
+              value={formatPriceDisplay(form.price / 1000)}
+              onChange={(e) => setForm({ ...form, price: parsePriceInput(e.target.value) })}
+              fullWidth
+            />
           </Stack>
 
           <FormControl fullWidth>

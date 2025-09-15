@@ -1,5 +1,4 @@
-// src/components/Header.jsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   AppBar,
   Toolbar,
@@ -20,6 +19,8 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import CloseIcon from "@mui/icons-material/Close";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -28,8 +29,27 @@ const Header = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const { user, logout } = useContext(AuthContext); // ✅ lấy user từ context
+  const navigate = useNavigate();
+
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+    navigate("/login");
+  };
+
+  // ✅ lấy chữ cái đầu của tên user
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase();
+  };
 
   return (
     <>
@@ -37,9 +57,8 @@ const Header = () => {
         position="fixed"
         elevation={0}
         sx={{
-          backgroundColor: "#fffefdff", // màu cam
-          color: "#FB8C00", // text trắng
-          // borderBottom: "1px solid #FB8C00", // viền cam đậm hơn
+          backgroundColor: "#fffefdff",
+          color: "#FB8C00",
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
@@ -66,7 +85,7 @@ const Header = () => {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  bgcolor: "#FFF3E0", // màu nền nhạt cam
+                  bgcolor: "#FFF3E0",
                   px: 2,
                   py: 0.5,
                   borderRadius: "25px",
@@ -82,7 +101,11 @@ const Header = () => {
             )}
 
             {isMobile && (
-              <IconButton size="small" color="inherit" onClick={() => setSearchOpen(true)}>
+              <IconButton
+                size="small"
+                color="inherit"
+                onClick={() => setSearchOpen(true)}
+              >
                 <SearchIcon />
               </IconButton>
             )}
@@ -98,14 +121,14 @@ const Header = () => {
               <HelpOutlineIcon />
             </IconButton>
 
-            {/* Avatar */}
+            {/* Avatar theo user */}
             <IconButton onClick={handleMenuOpen} size="small">
               <Avatar
-                alt="Jane Doe"
-                src="/static/images/avatar/2.jpg"
-                sx={{ width: 36, height: 36, bgcolor: "#FB8C00" }} // nền cam
+                alt={user?.name || "User"}
+                src={user?.avatar || ""}
+                sx={{ width: 36, height: 36, bgcolor: "#FB8C00" }}
               >
-                JD
+                {!user?.avatar && getInitials(user?.name)} {/* Nếu ko có avatar thì hiển thị initials */}
               </Avatar>
             </IconButton>
             <Menu
@@ -117,7 +140,7 @@ const Header = () => {
             >
               <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
               <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-              <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Box>
         </Toolbar>
@@ -167,4 +190,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default Header; 

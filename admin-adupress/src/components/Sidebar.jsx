@@ -1,5 +1,6 @@
 // src/components/Sidebar.jsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react"; // ✅ thêm useContext
+import { useNavigate, NavLink } from "react-router-dom"; // ✅ thêm useNavigate
 import {
   Drawer,
   List,
@@ -14,7 +15,6 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { NavLink } from "react-router-dom";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -23,7 +23,8 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import LogoutIcon from "@mui/icons-material/Logout";
-import ArticleIcon from "@mui/icons-material/Article"; // <-- icon cho Blog
+import ArticleIcon from "@mui/icons-material/Article"; // icon cho Blog
+import { AuthContext } from "../context/AuthContext"; // ✅ import AuthContext
 
 const drawerWidth = 200;
 
@@ -40,7 +41,13 @@ const menuItems = [
 const Sidebar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+const { logout } = useContext(AuthContext);
+const navigate = useNavigate();
 
+const handleLogout = () => {
+  logout();          // xoá token/user
+  navigate("/login"); // chuyển về login
+};
   const [mobileOpen, setMobileOpen] = useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
@@ -92,31 +99,26 @@ const Sidebar = () => {
 
       {/* Logout */}
       <List>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/logout"
-            sx={{
-              color: "inherit",
-              transition: "all 0.3s ease",
-              "&.active": {
-                bgcolor: "rgba(255,165,0,0.15)", // background màu cam nhạt
-                color: "orange",
-                "& .MuiListItemIcon-root": { color: "orange" },
-              },
-              "&:hover": {
-                bgcolor: "rgba(255,165,0,0.1)",
-                color: "orange",
-                "& .MuiListItemIcon-root": { color: "orange" },
-              },
-            }}
-          >
-            <ListItemIcon>
-              <LogoutIcon />
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItemButton>
-        </ListItem>
+       <ListItem disablePadding>
+  <ListItemButton
+    onClick={handleLogout} // ✅ gọi hàm logout
+    sx={{
+      color: "inherit",
+      transition: "all 0.3s ease",
+      "&:hover": {
+        bgcolor: "rgba(255,165,0,0.1)",
+        color: "orange",
+        "& .MuiListItemIcon-root": { color: "orange" },
+      },
+    }}
+  >
+    <ListItemIcon>
+      <LogoutIcon />
+    </ListItemIcon>
+    <ListItemText primary="Logout" />
+  </ListItemButton>
+</ListItem>
+
       </List>
     </Box>
   );

@@ -88,17 +88,15 @@
 
 // src/utils/helpers.js
 
-const USD_TO_VND = 5000;
-
+// Hiển thị tiền VND đẹp mắt
 export const formatCurrencyDisplay = (amount) => {
   if (!amount || isNaN(amount) || amount <= 0) return "0₫";
-  const vndValue = amount * USD_TO_VND;
-  return vndValue.toLocaleString("vi-VN") + "₫";
+  return Number(amount).toLocaleString("vi-VN") + "₫";
 };
 
 // Chỉ gửi số nguyên sang VNPay, min 100₫
 export const formatCurrencyPayment = (amount) => {
   if (!amount || isNaN(amount) || amount <= 0) return 100; // tránh 0
-  const vndValue = Math.round(amount * USD_TO_VND);
+  const vndValue = Math.round(amount);
   return vndValue < 100 ? 100 : vndValue;
 };

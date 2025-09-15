@@ -5,7 +5,6 @@ import Layout from "./components/Layout";
 
 // Pages
 import Dashboard from "./pages/Dashboard";
-// import Courses from "./pages/courses/Courses";
 import CourseDetail from "./pages/courses/CourseDetail";
 import Lessons from "./pages/Lessons";
 import LessonCreateEdit from "./pages/lessons/LessonCreateEdit";
@@ -17,12 +16,23 @@ import Courses from "./pages/courses/Courses";
 // Blog Pages
 import Blogs from "./pages/Blogs";
 import BlogCreateEdit from "./pages/BlogCreateEdit";
+import Login from "./pages/Login";
+
+// Route Guard
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
     <Routes>
-      {/* Admin layout */}
-      <Route path="/admin" element={<Layout />}>
+      {/* Admin layout with PrivateRoute */}
+      <Route
+        path="/admin"
+        element={
+          <PrivateRoute>
+            <Layout />
+          </PrivateRoute>
+        }
+      >
         {/* Dashboard */}
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
@@ -34,18 +44,15 @@ function App() {
 
         {/* Lessons */}
         <Route path="lessons" element={<Lessons />} />
-        {/* Danh sách lesson theo course */}
         <Route path="lessons/:courseId" element={<Lessons />} />
-        {/* Tạo mới lesson trong course */}
         <Route path="lessons/create/:courseId" element={<LessonCreateEdit />} />
-        {/* Chỉnh sửa lesson */}
         <Route path="lessons/edit/:id/:courseId" element={<LessonCreateEdit />} />
 
         {/* Reports */}
         <Route path="reports" element={<RevenueReport />} />
         <Route path="reports/:id" element={<RevenueDetail />} />
 
-        {/* Blog */}
+        {/* Blogs */}
         <Route path="blog" element={<Blogs />} />
         <Route path="blogs/create" element={<BlogCreateEdit />} />
         <Route path="blogs/edit/:id" element={<BlogCreateEdit />} />
@@ -56,6 +63,9 @@ function App() {
 
       {/* Redirect root → admin/dashboard */}
       <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+
+      {/* Login page (không cần PrivateRoute) */}
+      <Route path="/login" element={<Login />} />
 
       {/* Catch-all */}
       <Route path="*" element={<h2>404 - Page Not Found</h2>} />
