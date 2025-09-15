@@ -19,7 +19,7 @@ app.use(morgan("dev"));
 const allowedOrigins = [
   "http://localhost:5173", // FE customer local
   "http://localhost:5174", // FE admin local
-  "https://edupress-fe.netlify.app",
+  "https://fe-edupress.netlify.app/",
    "https://edupress-admin.netlify.app", 
   process.env.CLIENT_URL, // FE deployed
    process.env.ADMIN_URL  ,
