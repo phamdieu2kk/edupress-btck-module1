@@ -494,9 +494,6 @@
 
 
 
-
-
-
 // src/components/CartCourses.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -508,8 +505,8 @@ import {
   Stack,
 } from "@mui/material";
 import { useCart } from "../context/CartContext";
-import CartItems from "../components/CartItem"; // sửa đúng tên file
-import CartSummary from "../components/CartSummary";// sửa đúng tên file
+import CartItems from "../components/CartItem";
+import CartSummary from "../components/CartSummary";
 import Footer from "./Footer";
 import { formatCurrencyDisplay } from "../utils/helpers";
 
@@ -518,14 +515,16 @@ const CartCourses = () => {
   const [loading, setLoading] = useState(true);
   const [selectAll, setSelectAll] = useState(true);
 
-  // an toàn với SSR / Netlify
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  // Lấy token an toàn SSR
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   // Fetch Cart
   const fetchCart = async () => {
     setLoading(true);
     try {
       if (!token) throw new Error("No token found");
+
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -533,7 +532,7 @@ const CartCourses = () => {
       setCart(
         (res.data.items || []).map((item) => ({
           ...item,
-          checked: true,
+          checked: true, // mặc định checked
         }))
       );
     } catch (err) {
@@ -556,9 +555,7 @@ const CartCourses = () => {
 
   const toggleChecked = (itemId) => {
     setCart((prev) =>
-      prev.map((c) =>
-        c._id === itemId ? { ...c, checked: !c.checked } : c
-      )
+      prev.map((c) => (c._id === itemId ? { ...c, checked: !c.checked } : c))
     );
   };
 
@@ -566,11 +563,11 @@ const CartCourses = () => {
     setSelectAll(cart.length > 0 && cart.every((item) => item.checked));
   }, [cart]);
 
-  // Price helpers (an toàn với course null)
+  // Tính toán tổng
   const totalSelectedItems = cart.filter((i) => i.checked).length;
   const totalPrice = cart
     .filter((i) => i.checked)
-    .reduce((sum, i) => sum + Math.round((i.course?.price || 0) * i.quantity), 0); // nguyên số
+    .reduce((sum, i) => sum + Math.round((i.course?.price || 0) * i.quantity), 0);
   const isAnyItemSelected = cart.some((item) => item.checked);
 
   // Loading & Empty state

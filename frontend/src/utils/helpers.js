@@ -88,15 +88,13 @@
 
 // src/utils/helpers.js
 
-// Hiển thị tiền VND đẹp mắt
+// Hiển thị dạng 1,234,567₫
 export const formatCurrencyDisplay = (amount) => {
-  if (!amount || isNaN(amount) || amount <= 0) return "0₫";
-  return Number(amount).toLocaleString("vi-VN") + "₫";
+  if (!amount) return "0₫";
+  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 };
 
-// Chỉ gửi số nguyên sang VNPay, min 100₫
+// VNPay chuẩn: trả số nguyên VND
 export const formatCurrencyPayment = (amount) => {
-  if (!amount || isNaN(amount) || amount <= 0) return 100; // tránh 0
-  const vndValue = Math.round(amount);
-  return vndValue < 100 ? 100 : vndValue;
+  return Math.round(amount); // đảm bảo gửi số nguyên
 };
