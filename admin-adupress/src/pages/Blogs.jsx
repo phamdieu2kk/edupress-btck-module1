@@ -195,8 +195,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Delete, Edit } from "@mui/icons-material";
-import axiosClient from "../api/axiosClient"; // <- import axiosClient
-
+import axiosClient from "../api/axiosClient";
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
