@@ -173,75 +173,241 @@
 
 
 
+// // src/components/blog/FilterSidebar.jsx
+// import React, { useEffect, useState } from "react";
+// import { Box, Typography, Paper, Stack, ButtonBase, Chip, CircularProgress } from "@mui/material";
+// import { Link } from "react-router-dom";
+// import axios from "axios";
+
+// const BASE_URL = "http://localhost:5000/api/blogs";
+
+// const FilterSidebar = ({ selectedCategory, onCategoryChange, selectedTag, onTagChange }) => {
+//   const [blogs, setBlogs] = useState([]);
+//   const [loading, setLoading] = useState(true);
+
+// useEffect(() => {
+//   const fetchBlogs = async () => {
+//     try {
+//       const res = await axios.get(`${BASE_URL}?page=1&limit=1000`); // fetch all
+//       setBlogs(res.data.blogs || []);
+//     } catch (err) {
+//       console.error("Lỗi fetch blogs:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+//   fetchBlogs();
+// }, []);
+
+
+//   if (loading) return <Box display="flex" justifyContent="center" p={2}><CircularProgress /></Box>;
+
+//   // Categories
+//   const categoryMap = {};
+//   blogs.forEach(post => {
+//     const cats = Array.isArray(post.category) ? post.category : [post.category].filter(Boolean);
+//     cats.forEach(cat => {
+//       categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+//     });
+//   });
+//   const categories = Object.entries(categoryMap).map(([name, count]) => ({ name, count }));
+
+//   // Tags
+//   const tagSet = new Set();
+//   blogs.forEach(post => post.tags?.forEach(t => tagSet.add(t)));
+//   const tags = Array.from(tagSet);
+
+//   // Recent Posts
+//   const recentPosts = [...blogs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,3);
+
+//   return (
+//     <Paper elevation={0} sx={{ p:2 }}>
+//       <Stack spacing={4}>
+//         {/* Categories */}
+//         {categories.length>0 && (
+//           <Box>
+//             <Typography variant="h6" fontWeight={700} gutterBottom>Categories</Typography>
+//             <Stack spacing={1}>
+//               {categories.map(cat=>(
+//                 <ButtonBase key={cat.name} onClick={()=>onCategoryChange(cat.name)}
+//                   sx={{
+//                     display:"flex", justifyContent:"space-between", alignItems:"center", width:"100%",
+//                     px:2, py:1, borderRadius:2,
+//                     bgcolor:selectedCategory===cat.name?"primary.lighter":"background.paper",
+//                     color:selectedCategory===cat.name?"primary.main":"text.primary",
+//                     fontWeight:selectedCategory===cat.name?600:400,
+//                     "&:hover":{bgcolor:selectedCategory===cat.name?"primary.light":"action.hover"},
+//                     transition:"all 0.2s"
+//                   }}
+//                 >
+//                   <Typography variant="body2">{cat.name}</Typography>
+//                   <Typography variant="body2" color="text.secondary">{cat.count}</Typography>
+//                 </ButtonBase>
+//               ))}
+//             </Stack>
+//           </Box>
+//         )}
+
+//         {/* Recent Posts */}
+//         {recentPosts.length>0 && (
+//           <Box>
+//             <Typography variant="h6" fontWeight={700} gutterBottom>Recent Posts</Typography>
+//             <Stack spacing={2}>
+//               {recentPosts.map(post=>(
+//                 <Box key={post._id} display="flex" gap={1.5}>
+//                   <Box component="img" src={post.image||"/placeholder.jpg"} alt={post.title} 
+//                     sx={{width:60,height:60,borderRadius:1,objectFit:"cover",flexShrink:0}}/>
+//                   <Box>
+//                     <Link to={`/blog/${post._id}`} style={{textDecoration:"none"}}>
+//                       <Typography variant="subtitle2" fontWeight={600} color="text.primary"
+//                         sx={{lineHeight:1.4, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden","&:hover":{color:"primary.main"}}}>
+//                         {post.title}
+//                       </Typography>
+//                     </Link>
+//                   </Box>
+//                 </Box>
+//               ))}
+//             </Stack>
+//           </Box>
+//         )}
+
+//         {/* Tags */}
+//         {tags.length>0 && (
+//           <Box>
+//             <Typography variant="h6" fontWeight={700} gutterBottom>Tags</Typography>
+//             <Box sx={{display:"flex", flexWrap:"wrap", gap:1}}>
+//               {tags.map(tag=>(
+//                 <Chip key={tag} label={tag} clickable variant={selectedTag===tag?"filled":"outlined"}
+//                   color={selectedTag===tag?"primary":"default"}
+//                   onClick={()=>onTagChange(selectedTag===tag?null:tag)}
+//                   sx={{borderRadius:"6px", fontSize:"0.75rem"}}
+//                 />
+//               ))}
+//             </Box>
+//           </Box>
+//         )}
+//       </Stack>
+//     </Paper>
+//   );
+// };
+
+// export default FilterSidebar;
+
 // src/components/blog/FilterSidebar.jsx
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Paper, Stack, ButtonBase, Chip, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Paper,
+  Stack,
+  ButtonBase,
+  Chip,
+  CircularProgress,
+} from "@mui/material";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "@/api/axiosClient";
 
-const BASE_URL = "http://localhost:5000/api/blogs";
-
-const FilterSidebar = ({ selectedCategory, onCategoryChange, selectedTag, onTagChange }) => {
+const FilterSidebar = ({
+  selectedCategory,
+  onCategoryChange,
+  selectedTag,
+  onTagChange,
+}) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const fetchBlogs = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}?page=1&limit=1000`); // fetch all
-      setBlogs(res.data.blogs || []);
-    } catch (err) {
-      console.error("Lỗi fetch blogs:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchBlogs();
-}, []);
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await axiosClient.get("/blogs", {
+          params: { page: 1, limit: 1000 }, // fetch all
+        });
+        setBlogs(res.data.blogs || []);
+      } catch (err) {
+        console.error("❌ Lỗi fetch blogs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
-
-  if (loading) return <Box display="flex" justifyContent="center" p={2}><CircularProgress /></Box>;
+  if (loading)
+    return (
+      <Box display="flex" justifyContent="center" p={2}>
+        <CircularProgress />
+      </Box>
+    );
 
   // Categories
   const categoryMap = {};
-  blogs.forEach(post => {
-    const cats = Array.isArray(post.category) ? post.category : [post.category].filter(Boolean);
-    cats.forEach(cat => {
+  blogs.forEach((post) => {
+    const cats = Array.isArray(post.category)
+      ? post.category
+      : [post.category].filter(Boolean);
+    cats.forEach((cat) => {
       categoryMap[cat] = (categoryMap[cat] || 0) + 1;
     });
   });
-  const categories = Object.entries(categoryMap).map(([name, count]) => ({ name, count }));
+  const categories = Object.entries(categoryMap).map(([name, count]) => ({
+    name,
+    count,
+  }));
 
   // Tags
   const tagSet = new Set();
-  blogs.forEach(post => post.tags?.forEach(t => tagSet.add(t)));
+  blogs.forEach((post) => post.tags?.forEach((t) => tagSet.add(t)));
   const tags = Array.from(tagSet);
 
   // Recent Posts
-  const recentPosts = [...blogs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,3);
+  const recentPosts = [...blogs]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 3);
 
   return (
-    <Paper elevation={0} sx={{ p:2 }}>
+    <Paper elevation={0} sx={{ p: 2 }}>
       <Stack spacing={4}>
         {/* Categories */}
-        {categories.length>0 && (
+        {categories.length > 0 && (
           <Box>
-            <Typography variant="h6" fontWeight={700} gutterBottom>Categories</Typography>
+            <Typography variant="h6" fontWeight={700} gutterBottom>
+              Categories
+            </Typography>
             <Stack spacing={1}>
-              {categories.map(cat=>(
-                <ButtonBase key={cat.name} onClick={()=>onCategoryChange(cat.name)}
+              {categories.map((cat) => (
+                <ButtonBase
+                  key={cat.name}
+                  onClick={() => onCategoryChange(cat.name)}
                   sx={{
-                    display:"flex", justifyContent:"space-between", alignItems:"center", width:"100%",
-                    px:2, py:1, borderRadius:2,
-                    bgcolor:selectedCategory===cat.name?"primary.lighter":"background.paper",
-                    color:selectedCategory===cat.name?"primary.main":"text.primary",
-                    fontWeight:selectedCategory===cat.name?600:400,
-                    "&:hover":{bgcolor:selectedCategory===cat.name?"primary.light":"action.hover"},
-                    transition:"all 0.2s"
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                    px: 2,
+                    py: 1,
+                    borderRadius: 2,
+                    bgcolor:
+                      selectedCategory === cat.name
+                        ? "primary.lighter"
+                        : "background.paper",
+                    color:
+                      selectedCategory === cat.name
+                        ? "primary.main"
+                        : "text.primary",
+                    fontWeight: selectedCategory === cat.name ? 600 : 400,
+                    "&:hover": {
+                      bgcolor:
+                        selectedCategory === cat.name
+                          ? "primary.light"
+                          : "action.hover",
+                    },
+                    transition: "all 0.2s",
                   }}
                 >
                   <Typography variant="body2">{cat.name}</Typography>
-                  <Typography variant="body2" color="text.secondary">{cat.count}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {cat.count}
+                  </Typography>
                 </ButtonBase>
               ))}
             </Stack>
@@ -249,18 +415,44 @@ useEffect(() => {
         )}
 
         {/* Recent Posts */}
-        {recentPosts.length>0 && (
+        {recentPosts.length > 0 && (
           <Box>
-            <Typography variant="h6" fontWeight={700} gutterBottom>Recent Posts</Typography>
+            <Typography variant="h6" fontWeight={700} gutterBottom>
+              Recent Posts
+            </Typography>
             <Stack spacing={2}>
-              {recentPosts.map(post=>(
+              {recentPosts.map((post) => (
                 <Box key={post._id} display="flex" gap={1.5}>
-                  <Box component="img" src={post.image||"/placeholder.jpg"} alt={post.title} 
-                    sx={{width:60,height:60,borderRadius:1,objectFit:"cover",flexShrink:0}}/>
+                  <Box
+                    component="img"
+                    src={post.image || "/placeholder.jpg"}
+                    alt={post.title}
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 1,
+                      objectFit: "cover",
+                      flexShrink: 0,
+                    }}
+                  />
                   <Box>
-                    <Link to={`/blog/${post._id}`} style={{textDecoration:"none"}}>
-                      <Typography variant="subtitle2" fontWeight={600} color="text.primary"
-                        sx={{lineHeight:1.4, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden","&:hover":{color:"primary.main"}}}>
+                    <Link
+                      to={`/blog/${post._id}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight={600}
+                        color="text.primary"
+                        sx={{
+                          lineHeight: 1.4,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          "&:hover": { color: "primary.main" },
+                        }}
+                      >
                         {post.title}
                       </Typography>
                     </Link>
@@ -272,15 +464,21 @@ useEffect(() => {
         )}
 
         {/* Tags */}
-        {tags.length>0 && (
+        {tags.length > 0 && (
           <Box>
-            <Typography variant="h6" fontWeight={700} gutterBottom>Tags</Typography>
-            <Box sx={{display:"flex", flexWrap:"wrap", gap:1}}>
-              {tags.map(tag=>(
-                <Chip key={tag} label={tag} clickable variant={selectedTag===tag?"filled":"outlined"}
-                  color={selectedTag===tag?"primary":"default"}
-                  onClick={()=>onTagChange(selectedTag===tag?null:tag)}
-                  sx={{borderRadius:"6px", fontSize:"0.75rem"}}
+            <Typography variant="h6" fontWeight={700} gutterBottom>
+              Tags
+            </Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {tags.map((tag) => (
+                <Chip
+                  key={tag}
+                  label={tag}
+                  clickable
+                  variant={selectedTag === tag ? "filled" : "outlined"}
+                  color={selectedTag === tag ? "primary" : "default"}
+                  onClick={() => onTagChange(selectedTag === tag ? null : tag)}
+                  sx={{ borderRadius: "6px", fontSize: "0.75rem" }}
                 />
               ))}
             </Box>

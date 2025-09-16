@@ -89,7 +89,7 @@ const CartCourses = () => {
     try {
       setCart((prev) => prev.filter((i) => i._id !== id));
       if (!token) return;
-      await axios.delete(`${import.meta.env.VITE_API_URL}/cart/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch (err) {
