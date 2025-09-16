@@ -81,15 +81,12 @@
 // export default api;
 
 
-
 // src/api.js
 import axios from "axios";
 
 // Tự động lấy baseURL theo môi trường (Vite)
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
-    ? `${import.meta.env.VITE_API_URL}/api`
-    : "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true, // nếu backend có cookie / auth
 });
 

@@ -1,3 +1,4 @@
+// src/components/Courses/CourseList.jsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -46,7 +47,9 @@ const CourseList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const itemsPerPage = 8;
-  const API_URL = "http://localhost:5000";
+
+  // ✅ Lấy API URL từ biến môi trường (Netlify/Render)
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
 
@@ -73,8 +76,8 @@ const CourseList = () => {
     const fetchAllCourses = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_URL}/api/courses`, {
-          params: { limit: 100 }, // Cố định limit để lấy một lượng lớn dữ liệu
+        const res = await axios.get(`${API_URL}/courses`, {
+          params: { limit: 100 },
         });
         const allFetchedCourses = Array.isArray(res.data.courses) ? res.data.courses : [];
         const activeData = allFetchedCourses.filter((course) => course.status === "active");
@@ -89,7 +92,7 @@ const CourseList = () => {
       }
     };
     fetchAllCourses();
-  }, []);
+  }, [API_URL]);
 
   // Filter and paginate based on state changes
   useEffect(() => {
@@ -301,7 +304,7 @@ const CourseList = () => {
       </Drawer>
       <Footer />
     </>
-  );z
+  );
 };
 
 export default CourseList;
